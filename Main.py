@@ -15,7 +15,11 @@ filtered_data = np.array(data._X.todense())
 #Create Centroid Array
 clusters_amount = 5
 centroids_numbers = np.random.randint(2700, size=clusters_amount)
-centroids_array = []
+centroids_array = np.empty([0, 16634])
 i = 0
 while i < clusters_amount:
-    centroids_array.append(centroids_array, filtered_data[centroids_numbers[i]], axis=1)
+    randompatient = centroids_numbers[i]
+    centroids_array = np.append(centroids_array, [filtered_data[randompatient, :]], axis = 0)
+    i += 1
+
+print(centroids_array)
