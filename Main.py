@@ -1,5 +1,5 @@
 # Import libraries
-import numpy
+import numpy as np
 import pandas
 import matplotlib.pyplot as pyplot
 import matplotlib.cm as cm
@@ -27,5 +27,3 @@ while i < clusters_amount:
     randompatient = centroids_numbers[i]
     centroids_array = np.append(centroids_array, [filtered_data[randompatient, :]], axis = 0)
     i += 1
-
-print(centroids_array)
