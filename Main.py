@@ -8,7 +8,7 @@ import scanpy as sc
 def dist(patient_point, cluster_number):
     a = filtered_data[patient_point, :]
     b = centroids_array[cluster_number, :]
-    dist = numpy.linalg.norm(a-b)
+    dist = np.linalg.norm(a-b)
     return dist
 
 # Import data
