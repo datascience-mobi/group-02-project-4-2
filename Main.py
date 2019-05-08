@@ -8,7 +8,9 @@ from datetime import datetime
 
 # Global Variables
 t1 = 0
-
+patients = 0
+genes = 0
+k = 0
 
 # Functions
 
@@ -39,8 +41,10 @@ filtered_data = np.array(data._X.todense())
 
 # Create Centroid Array by randomly picking 5 patients from data  
 k = 5
-centroids_numbers = np.random.randint(2700, size=k)
-centroids_array = np.empty([0, 16634])
+patients = filtered_data.shape[0]
+genes = filtered_data.shape[1]
+centroids_numbers = np.random.randint(patients, size=k)
+centroids_array = np.empty([0, genes])
 i = 0
 
 
@@ -51,8 +55,8 @@ while i < k:
 
 # Loop über alle Patienten
 i = 0
-nearest_centroid = np.zeros([2700, 1])    
-while (i < 2700):
+nearest_centroid = np.zeros([patients, 1])    
+while (i < patients):
     sml_distance = 0
 
     # While loop selecting every centroid
