@@ -12,15 +12,10 @@ t1 = 0
 patients = 0
 genes = 0
 k = 0
+centroids_array = 0
 
 # Functions
 # Define distance function which takes integer inputs which identify patient and centroid
-def dist(patient_point, cluster_number):
-    a = pca_data[patient_point, :]
-    b = centroids_array[cluster_number, :]
-    dist = np.linalg.norm(a-b)
-    return dist
-
 def runtime_start():
     global t1 
     t1 = datetime.now().time()
@@ -32,6 +27,7 @@ def runtime_end():
     return elapsed
 
 def random_start_centroids(k):
+    global centroids_array
     # Create Centroid Array by randomly picking 5 patients from data  
     k = 5
     patients = pca_data.shape[0]
@@ -63,6 +59,13 @@ def assign_centroids():
                 nearest_centroid[i, 0] = j
             j += 1
         i += 1
+
+def dist(patient_point, cluster_number):
+    global centroids_array
+    a = pca_data[patient_point, :]
+    b = centroids_array[cluster_number, :]
+    dist = np.linalg.norm(a-b)
+    return dist
 
 def kmeans():
     random_start_centroids(5)
