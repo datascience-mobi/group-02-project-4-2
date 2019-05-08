@@ -55,8 +55,8 @@ def assign_centroids():
         sml_distance = 0
 
         # While loop selecting every centroid
-        j = 0
-        while j < k:
+        j = 1
+        while j <= k:
 
             if sml_distance == 0 or dist(i, j) < sml_distance:
                 sml_distance = dist(i, j)
@@ -68,10 +68,22 @@ def assign_centroids():
 def dist(patient_point, cluster_number):
     global centroids_array
     a = pca_data[patient_point, :]
-    b = centroids_array[cluster_number, :]
+    b = centroids_array[cluster_number-1, :]
     d = np.linalg.norm(a-b)
     return d
+    
 
+def new_centroids(): #incomplete
+zeros = np.zeros([patients,1])
+#"Masken" um values aus pca_data abzurufen
+nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
+nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
+#while/for loop der für alle 5 cluster läuft:
+    #i = 1
+    #for i<5
+    #x = mean(pca_data[nearest_centroidpca1 == i])
+    #y = mean(pca_data[nearest_centroidpca2 == i])
+    #neuen centroid speichern in centroids_array?
 
 def kmeans():
     random_start_centroids()
@@ -98,5 +110,7 @@ print(pca.singular_values_)
 kmeans()
 pyplot.scatter(pca_data[:, 0], pca_data[:, 1])
 pyplot.show()
+
+
 
 runtime_end()
