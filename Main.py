@@ -13,21 +13,6 @@ patients = 0
 genes = 0
 k = 0
 
-# General Code
-# Import data
-runtime_start()
-data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
-
-# Filter useless data
-sc.pp.filter_genes(data, min_cells=1)
-filtered_data = np.array(data._X.todense())
-
-# PCA
-pca = PCA(n_components=2)
-pca_data = pca.fit_transform(filtered_data)
-print(sum(pca.explained_variance_ratio_))
-print(pca.singular_values_)
-
 # Functions
 # Define distance function which takes integer inputs which identify patient and centroid
 def dist(patient_point, cluster_number):
@@ -82,6 +67,21 @@ def assign_centroids():
 def kmeans():
     random_start_centroids(5)
     assign_centroids()
+
+# General Code
+# Import data
+runtime_start()
+data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
+
+# Filter useless data
+sc.pp.filter_genes(data, min_cells=1)
+filtered_data = np.array(data._X.todense())
+
+# PCA
+pca = PCA(n_components=2)
+pca_data = pca.fit_transform(filtered_data)
+print(sum(pca.explained_variance_ratio_))
+print(pca.singular_values_)
 
 
 # Execute
