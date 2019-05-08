@@ -15,22 +15,23 @@ k = 5
 centroids_array = 0
 nearest_centroid = 0
 
+
 # Functions
 # Define distance function which takes integer inputs which identify patient and centroid
 def runtime_start():
     global t1 
     t1 = datetime.now().time()
 
+
 def runtime_end():
     t2 = datetime.now().time()
-    FMT = '%H:%M:%S.%f'
-    elapsed = str(datetime.strptime(str(t2), FMT) - datetime.strptime(str(t1), FMT))
+    fmt = '%H:%M:%S.%f'
+    elapsed = str(datetime.strptime(str(t2), fmt) - datetime.strptime(str(t1), fmt))
     return str("Runtime: " + elapsed)
 
+
 def random_start_centroids():
-    global centroids_array
-    global patients
-    global k
+    global centroids_array, patients, genes, k
     # Create Centroid Array by randomly picking 5 patients from data  
     patients = pca_data.shape[0]
     genes = pca_data.shape[1]
@@ -39,41 +40,43 @@ def random_start_centroids():
     i = 0
     # Pick random start sample 
     while i < k:
-        randompatient = centroids_numbers[i]
-        centroids_array = np.append(centroids_array, [pca_data[randompatient, :]], axis = 0)
+        random_patient = centroids_numbers[i]
+        centroids_array = np.append(centroids_array, [pca_data[random_patient, :]], axis=0)
         i += 1
 
+
 def assign_centroids():
-    global nearest_centroid
-    global patients
-    global k
+    global nearest_centroid, patients, k
     # Assign closest Centroid
     # Loop über alle Punkte
     i = 0
     nearest_centroid = np.zeros([patients, 1])    
-    while (i < patients):
+    while i < patients:
         sml_distance = 0
 
         # While loop selecting every centroid
         j = 0
-        while (j < k):
+        while j < k:
 
-            if sml_distance == 0 or dist(i,j) < sml_distance:
-                sml_distance = dist(i,j)
+            if sml_distance == 0 or dist(i, j) < sml_distance:
+                sml_distance = dist(i, j)
                 nearest_centroid[i, 0] = j
             j += 1
         i += 1
+
 
 def dist(patient_point, cluster_number):
     global centroids_array
     a = pca_data[patient_point, :]
     b = centroids_array[cluster_number, :]
-    dist = np.linalg.norm(a-b)
-    return dist
+    d = np.linalg.norm(a-b)
+    return d
+
 
 def kmeans():
     random_start_centroids()
     assign_centroids()
+
 
 # General Code
 # Import data
@@ -93,7 +96,7 @@ print(pca.singular_values_)
 
 # Execute
 kmeans()
-pyplot.scatter(pca_data[:,0], pca_data[:,1])
+pyplot.scatter(pca_data[:, 0], pca_data[:, 1])
 pyplot.show()
 
 runtime_end()
