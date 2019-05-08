@@ -38,14 +38,36 @@ sc.pp.filter_genes(data, min_cells=1)
 filtered_data = np.array(data._X.todense())
 
 # Create Centroid Array by randomly picking 5 patients from data  
-clusters_amount = 5
-centroids_numbers = np.random.randint(2700, size=clusters_amount)
+k = 5
+centroids_numbers = np.random.randint(2700, size=k)
 centroids_array = np.empty([0, 16634])
 i = 0
 
 
-while i < clusters_amount:
+while i < k:
     randompatient = centroids_numbers[i]
     centroids_array = np.append(centroids_array, [filtered_data[randompatient, :]], axis = 0)
     i += 1
+
+# Loop über alle Patienten
+i = 0
+nearest_centroid = np.zeros([2700, 1])    
+while (i < 2700):
+    sml_distance = 0
+
+    # While loop selecting every centroid
+    j = 0
+    while (j < k):
+
+        if sml_distance == 0:
+            sml_distance = dist(i,j)
+            nearest_centroid[i, 0] = j
+        elif dist(i,j) < sml_distance:
+            sml_distance = dist(i,j)
+            nearest_centroid[i, 0] = j
+        else:
+            pass
+        j += 1
+    i += 1
+
 runtime_end()
