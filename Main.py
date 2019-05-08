@@ -13,11 +13,25 @@ patients = 0
 genes = 0
 k = 0
 
-# Functions
+# General Code
+# Import data
+runtime_start()
+data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
 
+# Filter useless data
+sc.pp.filter_genes(data, min_cells=1)
+filtered_data = np.array(data._X.todense())
+
+# PCA
+pca = PCA(n_components=2)
+pca_data = pca.fit_transform(filtered_data)
+print(sum(pca.explained_variance_ratio_))
+print(pca.singular_values_)
+
+# Functions
 # Define distance function which takes integer inputs which identify patient and centroid
 def dist(patient_point, cluster_number):
-    a = filtered_data[patient_point, :]
+    a = pca_data[patient_point, :]
     b = centroids_array[cluster_number, :]
     dist = np.linalg.norm(a-b)
     return dist
@@ -32,48 +46,45 @@ def runtime_end():
     elapsed = str(datetime.strptime(str(t2), FMT) - datetime.strptime(str(t1), FMT))
     return elapsed
 
-# Import data
-runtime_start()
-data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
+def random_start_centroids(k):
+    # Create Centroid Array by randomly picking 5 patients from data  
+    k = 5
+    patients = pca_data.shape[0]
+    genes = pca_data.shape[1]
+    centroids_numbers = np.random.randint(patients, size=k)
+    centroids_array = np.empty([0, genes])
+    k = k
+    i = 0
+    # Pick random start sample 
+    while i < k:
+        randompatient = centroids_numbers[i]
+        centroids_array = np.append(centroids_array, [pca_data[randompatient, :]], axis = 0)
+        i += 1
 
-# Filter useless data
-sc.pp.filter_genes(data, min_cells=1)
-filtered_data = np.array(data._X.todense())
+def assign_centroids():
+    # Assign closest Centroid
+    # Loop über alle Punkte
+    i = 0
+    nearest_centroid = np.zeros([patients, 1])    
+    while (i < patients):
+        sml_distance = 0
 
-# PCA
-pca = PCA(n_components=2)
-pca_data = pca.fit_transform(filtered_data)
-print(pca.explained_variance_ratio_)
-print(pca.singular_values_)
+        # While loop selecting every centroid
+        j = 0
+        while (j < k):
 
-# Create Centroid Array by randomly picking 5 patients from data  
-k = 5
-patients = filtered_data.shape[0]
-genes = filtered_data.shape[1]
-centroids_numbers = np.random.randint(patients, size=k)
-centroids_array = np.empty([0, genes])
-i = 0
+            if sml_distance == 0 or dist(i,j) < sml_distance:
+                sml_distance = dist(i,j)
+                nearest_centroid[i, 0] = j
+            j += 1
+        i += 1
+
+def kmeans():
+    random_start_centroids(5)
+    assign_centroids()
 
 
-while i < k:
-    randompatient = centroids_numbers[i]
-    centroids_array = np.append(centroids_array, [filtered_data[randompatient, :]], axis = 0)
-    i += 1
-
-# Loop über alle Punkte
-i = 0
-nearest_centroid = np.zeros([patients, 1])    
-while (i < patients):
-    sml_distance = 0
-
-    # While loop selecting every centroid
-    j = 0
-    while (j < k):
-
-        if sml_distance == 0 or dist(i,j) < sml_distance:
-            sml_distance = dist(i,j)
-            nearest_centroid[i, 0] = j
-        j += 1
-    i += 1
+# Execute
+kmeans()
 
 runtime_end()
