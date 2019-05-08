@@ -74,20 +74,25 @@ def dist(patient_point, cluster_number):
     
 
 def new_centroids(): #incomplete
-zeros = np.zeros([patients,1])
-#"Masken" um values aus pca_data abzurufen
-nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
-nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
-#while/for loop der für alle 5 cluster läuft:
-    #i = 1
-    #for i<5
-    #x = mean(pca_data[nearest_centroidpca1 == i])
-    #y = mean(pca_data[nearest_centroidpca2 == i])
-    #neuen centroid speichern in centroids_array?
+    zeros = np.zeros([patients,1])
+    #"Masken" um values aus pca_data abzurufen
+    nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
+    nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
+    #while loop der für alle 5 cluster läuft:
+    i = 1
+    while i <= k:
+        pca1 = np.mean(pca_data[nearest_centroidpca1 == i])
+        pca2 = np.mean(pca_data[nearest_centroidpca2 == i])
+        i += 1
+        #neuen centroid speichern in centroids_array?
+        #print(pca1)
+        #print(pca2)
+
 
 def kmeans():
     random_start_centroids()
     assign_centroids()
+    new_centroids()
 
 
 # General Code
@@ -95,9 +100,11 @@ def kmeans():
 runtime_start()
 data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
 
+
 # Filter useless data
 sc.pp.filter_genes(data, min_cells=1)
 filtered_data = np.array(data._X.todense())
+
 
 # PCA
 pca = PCA(n_components=2)
@@ -110,7 +117,4 @@ print(pca.singular_values_)
 kmeans()
 pyplot.scatter(pca_data[:, 0], pca_data[:, 1])
 pyplot.show()
-
-
-
 runtime_end()
