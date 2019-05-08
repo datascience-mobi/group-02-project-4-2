@@ -7,64 +7,62 @@ import scanpy as sc
 from datetime import datetime
 from sklearn.decomposition import PCA
 
-
 # Global Variables
 t1 = 0
 patients = 0
 genes = 0
-k = 0
+k = 5
 centroids_array = 0
-
+nearest_centroid = 0
 
 # Functions
 # Define distance function which takes integer inputs which identify patient and centroid
 def runtime_start():
-    global t1
+    global t1 
     t1 = datetime.now().time()
-
 
 def runtime_end():
     t2 = datetime.now().time()
-    fmt = '%H:%M:%S.%f'
-    elapsed = str(datetime.strptime(str(t2), fmt) - datetime.strptime(str(t1), fmt))
-    return elapsed
+    FMT = '%H:%M:%S.%f'
+    elapsed = str(datetime.strptime(str(t2), FMT) - datetime.strptime(str(t1), FMT))
+    return str("Runtime: " + elapsed)
 
-
-def random_start_centroids(k):
+def random_start_centroids():
     global centroids_array
-    # Create Centroid Array by randomly picking 5 patients from data
-    k = 5
+    global patients
+    global k
+    # Create Centroid Array by randomly picking 5 patients from data  
     patients = pca_data.shape[0]
     genes = pca_data.shape[1]
     centroids_numbers = np.random.randint(patients, size=k)
     centroids_array = np.empty([0, genes])
-    k = k
     i = 0
-    # Pick random start sample
+    # Pick random start sample 
     while i < k:
         randompatient = centroids_numbers[i]
         centroids_array = np.append(centroids_array, [pca_data[randompatient, :]], axis = 0)
         i += 1
 
-
 def assign_centroids():
+    global nearest_centroid
+    global patients
+    global k
     # Assign closest Centroid
     # Loop über alle Punkte
     i = 0
-    nearest_centroid = np.zeros([patients, 1])
-    while i < patients:
+    nearest_centroid = np.zeros([patients, 1])    
+    while (i < patients):
         sml_distance = 0
 
         # While loop selecting every centroid
         j = 0
-        while j < k:
+        while (j < k):
 
             if sml_distance == 0 or dist(i,j) < sml_distance:
                 sml_distance = dist(i,j)
                 nearest_centroid[i, 0] = j
             j += 1
         i += 1
-
 
 def dist(patient_point, cluster_number):
     global centroids_array
@@ -73,11 +71,9 @@ def dist(patient_point, cluster_number):
     dist = np.linalg.norm(a-b)
     return dist
 
-
 def kmeans():
-    random_start_centroids(5)
+    random_start_centroids()
     assign_centroids()
-
 
 # General Code
 # Import data
@@ -86,7 +82,7 @@ data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene
 
 # Filter useless data
 sc.pp.filter_genes(data, min_cells=1)
-filtered_data = np.array(data._X.toarray())
+filtered_data = np.array(data._X.todense())
 
 # PCA
 pca = PCA(n_components=2)
@@ -97,7 +93,7 @@ print(pca.singular_values_)
 
 # Execute
 kmeans()
-pyplot.scatter(pca_data[:, 0], pca_data[:, 1])
+pyplot.scatter(pca_data[:,0], pca_data[:,1])
 pyplot.show()
 
 runtime_end()
