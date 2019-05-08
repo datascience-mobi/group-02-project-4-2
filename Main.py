@@ -89,5 +89,7 @@ print(pca.singular_values_)
 
 # Execute
 kmeans()
+pyplot.scatter(pca_data[:,0], pca_data[:,1])
+pyplot.show()
 
 runtime_end()
