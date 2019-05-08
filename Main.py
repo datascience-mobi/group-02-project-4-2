@@ -74,7 +74,9 @@ def dist(patient_point, cluster_number):
     
 
 def new_centroids(): #incomplete
+    global centroids_array
     zeros = np.zeros([patients,1])
+    centroids_array = np.empty([0, genes])
     #"Masken" um values aus pca_data abzurufen
     nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
     nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
@@ -83,11 +85,10 @@ def new_centroids(): #incomplete
     while i <= k:
         pca1 = np.mean(pca_data[nearest_centroidpca1 == i])
         pca2 = np.mean(pca_data[nearest_centroidpca2 == i])
+        centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
         i += 1
-        #neuen centroid speichern in centroids_array?
-        #print(pca1)
-        #print(pca2)
-
+        
+        
 
 def kmeans():
     random_start_centroids()
