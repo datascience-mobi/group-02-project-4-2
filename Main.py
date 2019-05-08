@@ -63,14 +63,9 @@ while (i < patients):
     j = 0
     while (j < k):
 
-        if sml_distance == 0:
+        if sml_distance == 0 or dist(i,j) < sml_distance:
             sml_distance = dist(i,j)
             nearest_centroid[i, 0] = j
-        elif dist(i,j) < sml_distance:
-            sml_distance = dist(i,j)
-            nearest_centroid[i, 0] = j
-        else:
-            pass
         j += 1
     i += 1
 
