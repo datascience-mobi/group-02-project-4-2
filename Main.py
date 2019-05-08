@@ -5,6 +5,7 @@ import matplotlib.pyplot as pyplot
 import matplotlib.cm as cm
 import scanpy as sc
 from datetime import datetime
+from sklearn.decomposition import PCA
 
 # Global Variables
 t1 = 0
@@ -39,6 +40,12 @@ data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene
 sc.pp.filter_genes(data, min_cells=1)
 filtered_data = np.array(data._X.todense())
 
+# PCA
+pca = PCA(n_components=2)
+pca_data = pca.fit_transform(filtered_data)
+print(pca.explained_variance_ratio_)
+print(pca.singular_values_)
+
 # Create Centroid Array by randomly picking 5 patients from data  
 k = 5
 patients = filtered_data.shape[0]
@@ -53,7 +60,7 @@ while i < k:
     centroids_array = np.append(centroids_array, [filtered_data[randompatient, :]], axis = 0)
     i += 1
 
-# Loop über alle Patienten
+# Loop über alle Punkte
 i = 0
 nearest_centroid = np.zeros([patients, 1])    
 while (i < patients):
