@@ -14,6 +14,7 @@ patients = 0
 genes = 0
 centroids_array = 0
 nearest_centroid = 0
+k = 0
 
 
 # Functions
@@ -121,7 +122,7 @@ pca_data = pca.fit_transform(filtered_data)
 
 # Execute
 runtime_start()
-kmeans(2, 10)
+kmeans(5, 10)
 print(runtime_end())
 
 
@@ -137,7 +138,7 @@ print("kmeans centroids:", centroids_array)
 #sklearn comparison
 plt1 = pyplot.subplot(111)
 runtime_start()
-sklearn_kmeans = KMeans(n_clusters=2).fit(pca_data)
+sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
 y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
 print(runtime_end())
 plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=50, cmap='viridis')
