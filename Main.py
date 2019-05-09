@@ -8,6 +8,7 @@ from datetime import datetime
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans 
 
+
 # Global Variables
 t1 = 0
 patients = 0
@@ -87,8 +88,7 @@ def new_centroids():
         pca2 = np.mean(pca_data[nearest_centroidpca2 == i])
         centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
         i += 1
-        
-        
+              
 
 def kmeans(k1, n_iterations):
         global k
@@ -126,21 +126,20 @@ print(runtime_end())
 
 
 # plotting
-plt = pyplot.subplot(111)
+fig = pyplot.figure(1, figsize=[10,5], dpi = 200)
+plt1, plt2 = fig.subplots(1,2, sharex=True, sharey=True)
 nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
-plt.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=50, cmap='viridis')
-plt.set_title('kmeans')
-pyplot.show()
+plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=20, cmap='viridis')
+plt1.set_title('kmeans')
 print("kmeans centroids:", centroids_array)
 
 
 #sklearn comparison
-plt1 = pyplot.subplot(111)
 runtime_start()
 sklearn_kmeans = KMeans(n_clusters=2).fit(pca_data)
 y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
 print(runtime_end())
-plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=50, cmap='viridis')
-plt1.set_title('sklearn kmeans')
+plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=20, cmap='viridis')
+plt2.set_title('sklearn kmeans')
 pyplot.show()
 print("sklearnkmeans centroids:", sklearn_kmeans.cluster_centers_)
