@@ -116,12 +116,12 @@ filtered_data = np.array(data._X.todense())
 # PCA
 pca = PCA(n_components=2)
 pca_data = pca.fit_transform(filtered_data)
-print(sum(pca.explained_variance_ratio_))
-print(pca.singular_values_)
+#print(sum(pca.explained_variance_ratio_))
+#print(pca.singular_values_)
 
 
 # Execute
-kmeans(15, 10)
+kmeans(2, 10)
 
 # Visualisation
 plt = pyplot.subplot(111)
@@ -131,11 +131,15 @@ colors = ["g","r","c","b","y", "m", "w"]
 nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
 plt.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=50, cmap='viridis')
 pyplot.show()
+print("kmeans centroids:", centroids_array)
+print(runtime_end())
 
-print(centroids_array)
-runtime_end()
-
-
+runtime_start()
 #sklearn comparison
-#sklearn_kmeans = KMeans(n_clusters=2).fit(filtered_data)
-#plt.scatter(pca_data[:, 0], pca_data[:, 1], c=y_kmeans, s=50, cmap='viridis')
+plt1 = pyplot.subplot(111)
+sklearn_kmeans = KMeans(n_clusters=2).fit(pca_data)
+y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
+plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=50, cmap='viridis')
+pyplot.show()
+print("sklearnkmeans centroids:", sklearn_kmeans.cluster_centers_)
+print(runtime_end())
