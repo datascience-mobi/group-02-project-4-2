@@ -6,6 +6,7 @@ import matplotlib.cm as cm
 import scanpy as sc
 from datetime import datetime
 from sklearn.decomposition import PCA
+from random import randint
 
 # Global Variables
 t1 = 0
@@ -120,12 +121,18 @@ print(pca.singular_values_)
 
 
 # Execute
-kmeans(2, 10)
+kmeans(15, 10)
+
+# Visualisation
 plt = pyplot.subplot(111)
-colors = ["g","r","c","b","y"]
+# colors = ["g","r","c","b","y"]
+colors = []
+for i in range(20):
+    colors.append("#" + '%06X' % randint(0, 0xFFFFFF))
 
 for i in range(len(pca_data)):
      plt.scatter(pca_data[i, 0], pca_data[i, 1], color=colors[int(nearest_centroid[i, 0])-1])
 pyplot.show()
+
 print(centroids_array)
 runtime_end()
