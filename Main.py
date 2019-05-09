@@ -121,7 +121,11 @@ print(pca.singular_values_)
 
 # Execute
 kmeans(2, 10)
-#pyplot.scatter(pca_data[:, 0], pca_data[:, 1])
-#pyplot.show()
+plt = pyplot.subplot(111)
+colors = ["g","r","c","b","y"]
+
+for i in range(len(pca_data)):
+     plt.scatter(pca_data[i, 0], pca_data[i, 1], color=colors[int(nearest_centroid[i, 0])-1])
+pyplot.show()
 print(centroids_array)
 runtime_end()
