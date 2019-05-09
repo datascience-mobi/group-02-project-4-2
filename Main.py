@@ -121,7 +121,9 @@ print(pca.singular_values_)
 
 
 # Execute
-kmeans(2, 10)
+kmeans(15, 10)
+
+# Visualisation
 plt = pyplot.subplot(111)
 colors = ["g","r","c","b","y", "m", "w"]
 
@@ -129,6 +131,7 @@ colors = ["g","r","c","b","y", "m", "w"]
 nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
 plt.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=50, cmap='viridis')
 pyplot.show()
+
 print(centroids_array)
 runtime_end()
 
