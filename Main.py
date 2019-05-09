@@ -6,6 +6,7 @@ import matplotlib.cm as cm
 import scanpy as sc
 from datetime import datetime
 from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans 
 
 # Global Variables
 t1 = 0
@@ -122,10 +123,16 @@ print(pca.singular_values_)
 # Execute
 kmeans(2, 10)
 plt = pyplot.subplot(111)
-colors = ["g","r","c","b","y"]
+colors = ["g","r","c","b","y", "m", "w"]
 
-for i in range(len(pca_data)):
-     plt.scatter(pca_data[i, 0], pca_data[i, 1], color=colors[int(nearest_centroid[i, 0])-1])
+#plotting
+nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
+plt.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=50, cmap='viridis')
 pyplot.show()
 print(centroids_array)
 runtime_end()
+
+
+#sklearn comparison
+#sklearn_kmeans = KMeans(n_clusters=2).fit(filtered_data)
+#plt.scatter(pca_data[:, 0], pca_data[:, 1], c=y_kmeans, s=50, cmap='viridis')
