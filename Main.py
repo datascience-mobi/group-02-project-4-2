@@ -125,12 +125,8 @@ kmeans(2, 10)
 print(runtime_end())
 
 
-# Visualisation
+# plotting
 plt = pyplot.subplot(111)
-colors = ["g","r","c","b","y", "m", "w"]
-
-
-#plotting
 nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
 plt.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=50, cmap='viridis')
 plt.set_title('kmeans')
