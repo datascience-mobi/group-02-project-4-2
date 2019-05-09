@@ -11,7 +11,6 @@ from sklearn.decomposition import PCA
 t1 = 0
 patients = 0
 genes = 0
-k = 5
 centroids_array = 0
 nearest_centroid = 0
 
@@ -32,7 +31,7 @@ def runtime_end():
 
 def random_start_centroids():
     global centroids_array, patients, genes, k
-    # Create Centroid Array by randomly picking 5 patients from data  
+    # Create Centroid Array by randomly picking k patients from data  
     patients = pca_data.shape[0]
     genes = pca_data.shape[1]
     centroids_numbers = np.random.randint(patients, size=k)
@@ -73,14 +72,14 @@ def dist(patient_point, cluster_number):
     return d
     
 
-def new_centroids(): #incomplete
+def new_centroids():
     global centroids_array
     zeros = np.zeros([patients,1])
     centroids_array = np.empty([0, genes])
     #"Masken" um values aus pca_data abzurufen
     nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
     nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
-    #while loop der für alle 5 cluster läuft:
+    #while loop der für alle k cluster läuft:
     i = 1
     while i <= k:
         pca1 = np.mean(pca_data[nearest_centroidpca1 == i])
@@ -90,10 +89,16 @@ def new_centroids(): #incomplete
         
         
 
-def kmeans():
-    random_start_centroids()
-    assign_centroids()
-    new_centroids()
+def kmeans(k1, n_iterations):
+        global k
+        k = k1
+        i = 0
+        random_start_centroids()
+        assign_centroids()
+        while i<n_iterations:
+                new_centroids()
+                assign_centroids()
+                i+=1
 
 
 # General Code
@@ -115,7 +120,8 @@ print(pca.singular_values_)
 
 
 # Execute
-kmeans()
-pyplot.scatter(pca_data[:, 0], pca_data[:, 1])
-pyplot.show()
+kmeans(2, 10)
+#pyplot.scatter(pca_data[:, 0], pca_data[:, 1])
+#pyplot.show()
+print(centroids_array)
 runtime_end()
