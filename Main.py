@@ -104,7 +104,6 @@ def kmeans(k1, n_iterations):
 
 # General Code
 # Import data
-runtime_start()
 data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
 
 
@@ -121,25 +120,31 @@ pca_data = pca.fit_transform(filtered_data)
 
 
 # Execute
+runtime_start()
 kmeans(2, 10)
+print(runtime_end())
+
 
 # Visualisation
 plt = pyplot.subplot(111)
 colors = ["g","r","c","b","y", "m", "w"]
 
+
 #plotting
 nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
 plt.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=50, cmap='viridis')
+plt.set_title('kmeans')
 pyplot.show()
 print("kmeans centroids:", centroids_array)
-print(runtime_end())
 
-runtime_start()
+
 #sklearn comparison
 plt1 = pyplot.subplot(111)
+runtime_start()
 sklearn_kmeans = KMeans(n_clusters=2).fit(pca_data)
 y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
+print(runtime_end())
 plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=50, cmap='viridis')
+plt1.set_title('sklearn kmeans')
 pyplot.show()
 print("sklearnkmeans centroids:", sklearn_kmeans.cluster_centers_)
-print(runtime_end())
