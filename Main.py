@@ -140,8 +140,8 @@ pca_data = pca.fit_transform(filtered_data)
 # Execute
 runtime_start()
 kmeans(5, 10)
+print("\nkmeans:")
 print(runtime_end())
-
 
 # plotting
 fig = pyplot.figure(1, figsize=[10,5], dpi = 200)
@@ -149,10 +149,12 @@ plt1, plt2 = fig.subplots(1,2, sharex=True, sharey=True)
 nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
 plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=20, cmap='viridis')
 plt1.set_title('kmeans')
-print("kmeans centroids:", centroids_array)
+a_str = np.array2string(centroids_array, precision=2, separator=' ')
+print("centroids: \n" + ' ' + a_str[1:-1])
 
 
 #sklearn comparison
+print("\nsklearn kmeans:")
 runtime_start()
 sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
 y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
@@ -160,4 +162,5 @@ print(runtime_end())
 plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=20, cmap='viridis')
 plt2.set_title('sklearn kmeans')
 pyplot.show()
-print("sklearnkmeans centroids:", sklearn_kmeans.cluster_centers_)
+b_str = np.array2string(sklearn_kmeans.cluster_centers_, precision=2, separator=' ')
+print("centroids: \n" + ' ' + b_str[1:-1])
