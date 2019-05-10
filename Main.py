@@ -49,7 +49,7 @@ def random_start_centroids(starttype):
             i += 1
 
     elif starttype == "randnum":
-        centroids_array = (max(pca_data[:, 1]) - min(pca_data[:, 1]))* np.random.random_sample((k, genes)) + min(pca_data[:, 1])
+        centroids_array = (np.amax(pca_data) - np.amin(pca_data))* np.random.random_sample((k, genes)) + np.amin(pca_data)
 
 def assign_centroids():
     global nearest_centroid, patients, k
