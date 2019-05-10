@@ -144,7 +144,7 @@ print(runtime_end())
 
 # plotting
 fig = pyplot.figure(1, figsize=[10, 5], dpi=200)
-plt1, plt2 = fig.subplots(1, 2, sharex=True, sharey=True)
+plt1, plt2 = fig.subplots(1, 2)
 nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
 plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=20, cmap='viridis')
 plt1.set_title('kmeans')
