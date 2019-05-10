@@ -32,20 +32,24 @@ def runtime_end():
     return str("Runtime: " + elapsed)
 
 
-def random_start_centroids():
+def random_start_centroids(starttype):
+    # Create Centroid Array by randomly picking k patients from data
     global centroids_array, patients, genes, k
-    # Create Centroid Array by randomly picking k patients from data  
     patients = pca_data.shape[0]
     genes = pca_data.shape[1]
-    centroids_numbers = np.random.randint(patients, size=k)
     centroids_array = np.empty([0, genes])
-    i = 0
-    # Pick random start sample 
-    while i < k:
-        random_patient = centroids_numbers[i]
-        centroids_array = np.append(centroids_array, [pca_data[random_patient, :]], axis=0)
-        i += 1
 
+    if starttype == "randpat":
+        centroids_numbers = np.random.randint(patients, size=k)
+        i = 0
+        # Pick random start sample 
+        while i < k:
+            random_patient = centroids_numbers[i]
+            centroids_array = np.append(centroids_array, [pca_data[random_patient, :]], axis=0)
+            i += 1
+
+    elif starttype == "randnum":
+        centroids_array = (max(pca_data[:, 1]) - min(pca_data[:, 1]))* np.random.random_sample((k, genes)) + min(pca_data[:, 1])
 
 def assign_centroids():
     global nearest_centroid, patients, k
@@ -66,6 +70,18 @@ def assign_centroids():
             j += 1
         i += 1
 
+def empty_check():
+    # Sicherstellen dass es durch die Zufallscentroids keine leeren Cluster gibt
+    i = 0
+    while i < k:
+        if list(nearest_centroid).count(i+1) == 0:
+            print("Empty cluster! Correcting centroids.")
+            random_start_centroids("randnum")
+            assign_centroids()
+            empty_check()
+        else:
+            pass
+        i += 1
 
 def dist(patient_point, cluster_number):
     global centroids_array
@@ -95,8 +111,9 @@ def kmeans(k1, n_iterations):
         global k
         k = k1
         i = 0
-        random_start_centroids()
+        random_start_centroids("randnum")
         assign_centroids()
+        empty_check()
         while i<n_iterations:
                 new_centroids()
                 assign_centroids()
