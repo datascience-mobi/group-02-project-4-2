@@ -7,6 +7,7 @@ import scanpy as sc
 from datetime import datetime
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
+from sklearn.ensemble import IsolationForest
 
 
 # Global Variables
@@ -165,13 +166,22 @@ def within_square_distance():
         with_sq_dist = np.empty([0,0])
         i = 0
         while (i < 1):
-                asigned_centroid = int(nearest_centroid[i,0])
+                asigned_centroid = int(nearest_centroid[i-1,0])
                 centr_val = centroids_array[asigned_centroid]
                 point_val = pca_data[i] 
                 i+=1
                 sqdist = np.linalg.norm(centr_val - point_val)**2
                 with_sq_dist = np.append(with_sq_dist, sqdist)              
         return(sum(with_sq_dist))
+    
+def remove_outliers():
+    global pca_data
+    X_train = pca_data
+    clf = IsolationForest(max_samples=100, random_state=None, behaviour="new", contamination=.1)
+    clf.fit(X_train)
+    y_pred_train = clf.predict(X_train)
+    print(y_pred_train)
+    pca_data = X_train[np.where(y_pred_train == 1, True, False)]
 
 # General Code
 # Import data
@@ -184,7 +194,8 @@ filtered_data = np.array(data._X.todense())
 # PCA
 pca = PCA(n_components=2)
 pca_data = pca.fit_transform(filtered_data)
-# print(sum(pca.explained_variance_ratio_))
+remove_outliers()
+print(sum(pca.explained_variance_ratio_))
 # print(pca.singular_values_)
 
 
@@ -192,7 +203,7 @@ pca_data = pca.fit_transform(filtered_data)
 runtime_start()
 
 # Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
-kmeans("randnum",5, 10, 0.1)
+kmeans("randnum",2, 10, 0.1)
 
 print("\nkmeans:")
 print(runtime_end())
