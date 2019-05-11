@@ -160,6 +160,19 @@ def kmeans(start, k1, n_iterations, t):
         thresh(t)
     improv()
 
+# calculates sum of the squared distance in each cluster
+def within_square_distance():
+        with_sq_dist = np.empty([0,0])
+        i = 0
+        while (i < 1):
+                asigned_centroid = int(nearest_centroid[i,0])
+                centr_val = centroids_array[asigned_centroid]
+                point_val = pca_data[i] 
+                i+=1
+                sqdist = np.linalg.norm(centr_val - point_val)**2
+                with_sq_dist = np.append(with_sq_dist, sqdist)              
+        return(sum(with_sq_dist))
+
 # General Code
 # Import data
 data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
