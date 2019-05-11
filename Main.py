@@ -141,13 +141,14 @@ def improv():
     print("Distances of clusters as compared to last generation: \n" + str(c_str))
  
 
-def kmeans(k1, n_iterations, t):
+def kmeans(start, k1, n_iterations, t):
     global k
     k = k1
     i = 0
-    random_start_centroids("randnum")
+    random_start_centroids(start)
     assign_centroids()
-    empty_check()
+    if start == "randnum":
+        empty_check()
     if t == None:
         while i < n_iterations:
             new_centroids()
@@ -177,8 +178,8 @@ pca_data = pca.fit_transform(filtered_data)
 # Execute
 runtime_start()
 
-# Clusters, Iterations (egal wenn t), Threshhold [float oder None]
-kmeans(5, 10, 0.1)
+# Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
+kmeans("randnum",5, 10, 0.1)
 
 print("\nkmeans:")
 print(runtime_end())
