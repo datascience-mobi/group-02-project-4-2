@@ -93,7 +93,8 @@ def dist(patient_point, cluster_number):
 
 
 def new_centroids():
-    global centroids_array
+    global centroids_array, centroids_oldarray
+    centroids_oldarray = centroids_array # create copy of old array for threshold funcion
     zeros = np.zeros([patients, 1])
     centroids_array = np.empty([0, genes])
     # "Masken" um values aus pca_data abzurufen
@@ -107,19 +108,56 @@ def new_centroids():
         centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
         i += 1
 
+# Clustering threshold, centroid arrays have the dimension k, genes, repeat until distance is smaller than t
+def thresh(t1):
+    global centroids_array, centroids_oldarray, k
+    t = t1  #threshold to determine when algorythm is done
+    i = 0
+    c = 1 # add counter to determine how many cycles have passed
+    while i < k: 
+        a = centroids_array[i,:]
+        b = centroids_oldarray[i,:]
+        d = np.linalg.norm(a-b)
+        if d < t:
+            i += 1 
+        elif d >= t:
+            new_centroids()
+            assign_centroids()
+            c += 1
+    print (str(c) + " iterations were performed")
+    # können wir wenn wir wollen dann ans ende von kmeans packen anstelle des while loops
 
-def kmeans(k1, n_iterations):
+
+# Function giving distance between clusters after n iterations            
+def improv():      
+    global centroids_array, centroids_oldarray, k
+    distances = []
+    i = 0
+    while i < k: 
+        d = np.linalg.norm(centroids_array[i, :] - centroids_oldarray[i,:])
+        distances.append(d)
+        i += 1
+    c_str = np.array2string(np.array(distances), precision=2)
+    print("Distances of clusters as compared to last generation: \n" + str(c_str))
+ 
+
+def kmeans(k1, n_iterations, t):
     global k
     k = k1
     i = 0
     random_start_centroids("randnum")
     assign_centroids()
     empty_check()
-    while i < n_iterations:
+    if t == None:
+        while i < n_iterations:
+            new_centroids()
+            assign_centroids()
+            i += 1
+    else:
         new_centroids()
         assign_centroids()
-        i += 1
-
+        thresh(t)
+    improv()
 
 # General Code
 # Import data
@@ -138,7 +176,10 @@ pca_data = pca.fit_transform(filtered_data)
 
 # Execute
 runtime_start()
-kmeans(5, 10)
+
+# Clusters, Iterations (egal wenn t), Threshhold [float oder None]
+kmeans(5, 10, 0.1)
+
 print("\nkmeans:")
 print(runtime_end())
 
