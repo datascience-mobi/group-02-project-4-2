@@ -241,11 +241,10 @@ b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmean
 print("centroids: \n" + ' ' + b_str[1:-1])
 
 if dimensions == 3:
-    fig2 = pyplot.figure(dpi = 200)
-    plt21 = fig2.add_subplot(111, projection = '3d')
+    fig2 = pyplot.figure(figsize=[10,5], dpi=200)
+    plt21 = fig2.add_subplot(221, projection = '3d')
     plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
     plt21.set_title('3d kmeans')
-    fig3 = pyplot.figure(dpi = 200)
-    plt22 = fig3.add_subplot(111, projection = '3d')
+    plt22 = fig2.add_subplot(222, projection = '3d')
     plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = y_sklearnkmeans, cmap='viridis')
     plt22.set_title('3D kmeans by sklearn')
