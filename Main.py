@@ -161,17 +161,41 @@ def kmeans(start, k1, n_iterations, t):
     improv()
 
 # calculates sum of the squared distance in each cluster
-def within_square_distance():
+def within_square_distance_self():
         with_sq_dist = np.empty([0,0])
         i = 0
-        while (i < 1):
+        while (i < len(pca_data)):
                 asigned_centroid = int(nearest_centroid[i,0])
-                centr_val = centroids_array[asigned_centroid]
+                centr_val = centroids_array[asigned_centroid-1]
                 point_val = pca_data[i] 
                 i+=1
                 sqdist = np.linalg.norm(centr_val - point_val)**2
                 with_sq_dist = np.append(with_sq_dist, sqdist)              
         return(sum(with_sq_dist))
+
+def within_square_distance_sklearn():
+    with_sq_dist = np.empty([0,0])
+    i = 0
+    while (i < len(pca_data)):
+         asigned_centroid = int(y_sklearnkmeans[i])
+         centr_val = sklearn_kmeans.cluster_centers_[asigned_centroid]
+         point_val = pca_data[i] 
+         i+=1
+         sqdist = np.linalg.norm(centr_val - point_val)**2
+         with_sq_dist = np.append(with_sq_dist, sqdist)              
+    return(sum(with_sq_dist))
+
+#Ellbow PCA
+def ellbow_pca(components):
+    n=0
+    test_array = np.empty([0])
+    while(n<components):
+        pca = PCA(n_components=n)
+        test = pca.fit_transform(filtered_data)
+        variance = sum(pca.explained_variance_ratio_)
+        n+=1
+        test_array = np.append(test_array, variance)
+    pyplot.plot(test_array)
 
 # General Code
 # Import data
@@ -217,3 +241,4 @@ plt2.set_title('sklearn kmeans')
 pyplot.show()
 b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
 print("centroids: \n" + ' ' + b_str[1:-1])
+
