@@ -192,7 +192,7 @@ def wss(where):
 def remove_outliers():
     global pca_data
     X_train = pca_data
-    clf = IsolationForest(behaviour="new", contamination=.07)
+    clf = IsolationForest(behaviour="new", contamination=.07, max_samples=0.25)
     clf.fit(X_train)
     y_pred_train = clf.predict(X_train)
     pca_data = X_train[np.where(y_pred_train == 1, True, False)]
@@ -228,6 +228,8 @@ data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene
 
 # Filter useless data & Processing
 sc.pp.filter_genes(data, min_cells=1)
+sc.pp.normalize_per_cell(data, counts_per_cell_after=1e4)
+sc.pp.log1p(data)
 filtered_data = np.array(data._X.todense())
 pca(2, rmo=True)
 
@@ -235,7 +237,7 @@ pca(2, rmo=True)
 runtime_start()
 
 # Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
-kmeans("randnum", 2, 10, 0.1)
+kmeans("randnum", 3, 10, 0.1)
 
 print("\nkmeans:")
 print(runtime_end())
