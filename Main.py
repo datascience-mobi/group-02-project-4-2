@@ -20,7 +20,7 @@ k = 0
 
 
 # Functions
-# Define distance function which takes integer inputs which identify patient and centroid
+# Define distance function which takes integer inputs which identify cell and centroid
 def runtime_start():
     global t1
     t1 = datetime.now().time()
@@ -40,13 +40,13 @@ def random_start_centroids(starttype):
     genes = pca_data.shape[1]
     centroids_array = np.empty([0, genes])
 
-    if starttype == "randpat":
+    if starttype == "randcell":
         centroids_numbers = np.random.randint(pbmcs, size=k)
         i = 0
         # Pick random start sample 
         while i < k:
-            random_patient = centroids_numbers[i]
-            centroids_array = np.append(centroids_array, [pca_data[random_patient, :]], axis=0)
+            random_cell = centroids_numbers[i]
+            centroids_array = np.append(centroids_array, [pca_data[random_cell, :]], axis=0)
             i += 1
 
     elif starttype == "randnum":
@@ -86,8 +86,8 @@ def empty_check():
         i += 1
 
 
-def dist(patient_point, cluster_number):
-    a = pca_data[patient_point, :]
+def dist(cell_point, cluster_number):
+    a = pca_data[cell_point, :]
     b = centroids_array[cluster_number - 1, :]
     d = np.linalg.norm(a - b)
     return d
