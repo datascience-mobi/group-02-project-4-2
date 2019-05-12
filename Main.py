@@ -7,19 +7,22 @@ import scanpy as sc
 from datetime import datetime
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
-
+from sklearn.ensemble import IsolationForest
+from mpl_toolkits.mplot3d import Axes3D
 
 # Global Variables
 t1 = 0
-patients = 0
+pbmcs = 0
 genes = 0
 centroids_array = 0
 nearest_centroid = 0
 k = 0
+dim = 0
+pca_data = []
 
 
 # Functions
-# Define distance function which takes integer inputs which identify patient and centroid
+# Define distance function which takes integer inputs which identify cell and centroid
 def runtime_start():
     global t1
     t1 = datetime.now().time()
@@ -33,19 +36,19 @@ def runtime_end():
 
 
 def random_start_centroids(starttype):
-    # Create Centroid Array by randomly picking k patients from data
-    global centroids_array, patients, genes
-    patients = pca_data.shape[0]
+    # Create Centroid Array by randomly picking k pbmcs from data
+    global centroids_array, pbmcs, genes
+    pbmcs = pca_data.shape[0]
     genes = pca_data.shape[1]
     centroids_array = np.empty([0, genes])
 
-    if starttype == "randpat":
-        centroids_numbers = np.random.randint(patients, size=k)
+    if starttype == "randcell":
+        centroids_numbers = np.random.randint(pbmcs, size=k)
         i = 0
         # Pick random start sample 
         while i < k:
-            random_patient = centroids_numbers[i]
-            centroids_array = np.append(centroids_array, [pca_data[random_patient, :]], axis=0)
+            random_cell = centroids_numbers[i]
+            centroids_array = np.append(centroids_array, [pca_data[random_cell, :]], axis=0)
             i += 1
 
     elif starttype == "randnum":
@@ -58,8 +61,8 @@ def assign_centroids():
     # Assign closest Centroid
     # Loop über alle Punkte
     i = 0
-    nearest_centroid = np.zeros([patients, 1])
-    while i < patients:
+    nearest_centroid = np.zeros([pbmcs, 1])
+    while i < pbmcs:
         sml_distance = 0
 
         # While loop selecting every centroid
@@ -85,8 +88,8 @@ def empty_check():
         i += 1
 
 
-def dist(patient_point, cluster_number):
-    a = pca_data[patient_point, :]
+def dist(cell_point, cluster_number):
+    a = pca_data[cell_point, :]
     b = centroids_array[cluster_number - 1, :]
     d = np.linalg.norm(a - b)
     return d
@@ -95,25 +98,35 @@ def dist(patient_point, cluster_number):
 def new_centroids():
     global centroids_array, centroids_oldarray
     centroids_oldarray = centroids_array # create copy of old array for threshold funcion
-    zeros = np.zeros([patients, 1])
+    zeros = np.zeros([pbmcs, 1])
     centroids_array = np.empty([0, genes])
     # "Masken" um values aus pca_data abzurufen
     nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
     nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
+
+    if dim ==3:
+        nearest_centroidpca1 = np.append(nearest_centroidpca1, zeros, axis=1)
+        nearest_centroidpca2 = np.append(nearest_centroidpca2, zeros, axis=1)
+        nearest_centroidpca3 = np.append(zeros, zeros, axis=1)
+        nearest_centroidpca3 = np.append(nearest_centroidpca3, nearest_centroid, axis=1)
     # while loop der für alle k cluster läuft:
     i = 1
     while i <= k:
         pca1 = np.mean(pca_data[nearest_centroidpca1 == i])
         pca2 = np.mean(pca_data[nearest_centroidpca2 == i])
-        centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
+        if dim == 3:
+            pca3 = np.mean(pca_data[nearest_centroidpca3 == i])
+            centroids_array = np.append(centroids_array, [[pca1, pca2, pca3]], axis=0)
+        else:
+            centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
         i += 1
 
 # Clustering threshold, centroid arrays have the dimension k, genes, repeat until distance is smaller than t
 def thresh(t1):
     global centroids_array, centroids_oldarray, k
-    t = t1  #threshold to determine when algorythm is done
+    t = t1  # Threshold to determine when algorithm is done
     i = 0
-    c = 1 # add counter to determine how many cycles have passed
+    c = 1 # Add counter to determine how many cycles have passed
     while i < k: 
         a = centroids_array[i,:]
         b = centroids_oldarray[i,:]
@@ -125,7 +138,7 @@ def thresh(t1):
             assign_centroids()
             c += 1
     print (str(c) + " iterations were performed")
-    # können wir wenn wir wollen dann ans ende von kmeans packen anstelle des while loops
+    # Können wir wenn wir wollen dann ans ende von kmeans packen anstelle des while loops
 
 
 # Function giving distance between clusters after n iterations            
@@ -172,7 +185,7 @@ def within_square_distance_self():
                 sqdist = np.linalg.norm(centr_val - point_val)**2
                 with_sq_dist = np.append(with_sq_dist, sqdist)              
         return(sum(with_sq_dist))
-
+        
 def within_square_distance_sklearn():
     with_sq_dist = np.empty([0,0])
     i = 0
@@ -184,6 +197,27 @@ def within_square_distance_sklearn():
          sqdist = np.linalg.norm(centr_val - point_val)**2
          with_sq_dist = np.append(with_sq_dist, sqdist)              
     return(sum(with_sq_dist))
+    
+def remove_outliers():
+    global pca_data
+    X_train = pca_data
+    clf = IsolationForest(max_samples=100, random_state=None, behaviour="new", contamination=.07)
+    clf.fit(X_train)
+    y_pred_train = clf.predict(X_train)
+    pca_data = X_train[np.where(y_pred_train == 1, True, False)]
+
+# PCA
+def pca(d, rmo=False):
+    global dim, pca_data
+    dim = d
+    pca = PCA(n_components=dim)
+    pca_data = pca.fit_transform(filtered_data)
+    if rmo == True:
+        remove_outliers()
+    print("Sum of explained variances: ""%.2f" % (sum(pca.explained_variance_ratio_)) + "\n")
+    # print(pca.singular_values_)
+
+
 
 #Ellbow PCA
 def ellbow_pca(components):
@@ -201,22 +235,16 @@ def ellbow_pca(components):
 # Import data
 data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
 
-# Filter useless data
+# Filter useless data & Processing
 sc.pp.filter_genes(data, min_cells=1)
 filtered_data = np.array(data._X.todense())
-
-# PCA
-pca = PCA(n_components=2)
-pca_data = pca.fit_transform(filtered_data)
-# print(sum(pca.explained_variance_ratio_))
-# print(pca.singular_values_)
-
+pca(2, rmo=True)
 
 # Execute
 runtime_start()
 
 # Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
-kmeans("randnum",5, 10, 0.1)
+kmeans("randnum", 2, 10, 0.1)
 
 print("\nkmeans:")
 print(runtime_end())
@@ -242,3 +270,11 @@ pyplot.show()
 b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
 print("centroids: \n" + ' ' + b_str[1:-1])
 
+if dim == 3:
+    fig2 = pyplot.figure(figsize=[10,5], dpi=200)
+    plt21 = fig2.add_subplot(221, projection = '3d')
+    plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
+    plt21.set_title('3d kmeans')
+    plt22 = fig2.add_subplot(222, projection = '3d')
+    plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = y_sklearnkmeans, cmap='viridis')
+    plt22.set_title('3D kmeans by sklearn')
