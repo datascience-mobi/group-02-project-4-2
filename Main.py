@@ -17,6 +17,8 @@ genes = 0
 centroids_array = 0
 nearest_centroid = 0
 k = 0
+dim = 0
+pca_data = []
 
 
 # Functions
@@ -102,7 +104,7 @@ def new_centroids():
     nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
     nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
 
-    if dimensions ==3:
+    if dim ==3:
         nearest_centroidpca1 = np.append(nearest_centroidpca1, zeros, axis=1)
         nearest_centroidpca2 = np.append(nearest_centroidpca2, zeros, axis=1)
         nearest_centroidpca3 = np.append(zeros, zeros, axis=1)
@@ -112,7 +114,7 @@ def new_centroids():
     while i <= k:
         pca1 = np.mean(pca_data[nearest_centroidpca1 == i])
         pca2 = np.mean(pca_data[nearest_centroidpca2 == i])
-        if dimensions == 3:
+        if dim == 3:
             pca3 = np.mean(pca_data[nearest_centroidpca3 == i])
             centroids_array = np.append(centroids_array, [[pca1, pca2, pca3]], axis=0)
         else:
@@ -122,9 +124,9 @@ def new_centroids():
 # Clustering threshold, centroid arrays have the dimension k, genes, repeat until distance is smaller than t
 def thresh(t1):
     global centroids_array, centroids_oldarray, k
-    t = t1  #threshold to determine when algorythm is done
+    t = t1  # Threshold to determine when algorithm is done
     i = 0
-    c = 1 # add counter to determine how many cycles have passed
+    c = 1 # Add counter to determine how many cycles have passed
     while i < k: 
         a = centroids_array[i,:]
         b = centroids_oldarray[i,:]
@@ -136,7 +138,7 @@ def thresh(t1):
             assign_centroids()
             c += 1
     print (str(c) + " iterations were performed")
-    # können wir wenn wir wollen dann ans ende von kmeans packen anstelle des while loops
+    # Können wir wenn wir wollen dann ans ende von kmeans packen anstelle des while loops
 
 
 # Function giving distance between clusters after n iterations            
@@ -190,25 +192,27 @@ def remove_outliers():
     clf = IsolationForest(max_samples=100, random_state=None, behaviour="new", contamination=.1)
     clf.fit(X_train)
     y_pred_train = clf.predict(X_train)
-    print(y_pred_train)
     pca_data = X_train[np.where(y_pred_train == 1, True, False)]
+
+# PCA
+def pca(d):
+    global dim, pca_data
+    dim = d
+    pca = PCA(n_components=dim)
+    pca_data = pca.fit_transform(filtered_data)
+    remove_outliers()
+    print("Sum of explained variances: ""%.2f" % (sum(pca.explained_variance_ratio_)) + "\n")
+    # print(pca.singular_values_)
+
 
 # General Code
 # Import data
 data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
 
-# Filter useless data
+# Filter useless data & Processing
 sc.pp.filter_genes(data, min_cells=1)
 filtered_data = np.array(data._X.todense())
-
-# PCA
-dimensions = 3
-pca = PCA(n_components=dimensions)
-pca_data = pca.fit_transform(filtered_data)
-remove_outliers()
-print(sum(pca.explained_variance_ratio_))
-# print(pca.singular_values_)
-
+pca(3)
 
 # Execute
 runtime_start()
@@ -240,7 +244,7 @@ pyplot.show()
 b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
 print("centroids: \n" + ' ' + b_str[1:-1])
 
-if dimensions == 3:
+if dim == 3:
     fig2 = pyplot.figure(figsize=[10,5], dpi=200)
     plt21 = fig2.add_subplot(221, projection = '3d')
     plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
