@@ -189,7 +189,7 @@ def within_square_distance():
 def remove_outliers():
     global pca_data
     X_train = pca_data
-    clf = IsolationForest(max_samples=100, random_state=None, behaviour="new", contamination=.1)
+    clf = IsolationForest(max_samples=100, random_state=None, behaviour="new", contamination=.07)
     clf.fit(X_train)
     y_pred_train = clf.predict(X_train)
     pca_data = X_train[np.where(y_pred_train == 1, True, False)]
@@ -219,7 +219,7 @@ pca(2, rmo=True)
 runtime_start()
 
 # Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
-kmeans("randnum",2, 10, 0.1)
+kmeans("randnum", 2, 10, 0.1)
 
 print("\nkmeans:")
 print(runtime_end())
