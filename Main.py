@@ -216,7 +216,7 @@ def ellbow_pca(components):
     test_array = np.empty([0])
     while(n<components):
         pca = PCA(n_components=n)
-        temp = pca.fit_transform(filtered_data)
+        pca.fit_transform(filtered_data)
         variance = sum(pca.explained_variance_ratio_)
         n+=1
         test_array = np.append(test_array, variance)
