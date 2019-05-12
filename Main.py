@@ -187,7 +187,7 @@ def wss(where):
                 i+=1
                 sqdist = np.linalg.norm(centr_val - point_val)**2
                 with_sq_dist = np.append(with_sq_dist, sqdist)              
-        return("%.2f" % (sum(with_sq_dist)))
+        return(sum(with_sq_dist))
             
 def remove_outliers():
     global pca_data
