@@ -12,7 +12,7 @@ from sklearn.ensemble import IsolationForest
 
 # Global Variables
 t1 = 0
-patients = 0
+pbmcs = 0
 genes = 0
 centroids_array = 0
 nearest_centroid = 0
@@ -34,14 +34,14 @@ def runtime_end():
 
 
 def random_start_centroids(starttype):
-    # Create Centroid Array by randomly picking k patients from data
-    global centroids_array, patients, genes
-    patients = pca_data.shape[0]
+    # Create Centroid Array by randomly picking k pbmcs from data
+    global centroids_array, pbmcs, genes
+    pbmcs = pca_data.shape[0]
     genes = pca_data.shape[1]
     centroids_array = np.empty([0, genes])
 
     if starttype == "randpat":
-        centroids_numbers = np.random.randint(patients, size=k)
+        centroids_numbers = np.random.randint(pbmcs, size=k)
         i = 0
         # Pick random start sample 
         while i < k:
@@ -59,8 +59,8 @@ def assign_centroids():
     # Assign closest Centroid
     # Loop über alle Punkte
     i = 0
-    nearest_centroid = np.zeros([patients, 1])
-    while i < patients:
+    nearest_centroid = np.zeros([pbmcs, 1])
+    while i < pbmcs:
         sml_distance = 0
 
         # While loop selecting every centroid
@@ -96,7 +96,7 @@ def dist(patient_point, cluster_number):
 def new_centroids():
     global centroids_array, centroids_oldarray
     centroids_oldarray = centroids_array # create copy of old array for threshold funcion
-    zeros = np.zeros([patients, 1])
+    zeros = np.zeros([pbmcs, 1])
     centroids_array = np.empty([0, genes])
     # "Masken" um values aus pca_data abzurufen
     nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
