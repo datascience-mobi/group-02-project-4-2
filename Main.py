@@ -174,30 +174,21 @@ def kmeans(start, k1, n_iterations, t):
     improv()
 
 # calculates sum of the squared distance in each cluster
-def within_square_distance_self():
+def wss(where):
         with_sq_dist = np.empty([0,0])
         i = 0
         while (i < len(pca_data)):
-                asigned_centroid = int(nearest_centroid[i,0])
+                if where == "self":
+                    asigned_centroid = int(nearest_centroid[i,0])
+                if where == "sklearn":
+                    asigned_centroid = int(y_sklearnkmeans[i])
                 centr_val = centroids_array[asigned_centroid-1]
                 point_val = pca_data[i] 
                 i+=1
                 sqdist = np.linalg.norm(centr_val - point_val)**2
                 with_sq_dist = np.append(with_sq_dist, sqdist)              
-        return(sum(with_sq_dist))
-        
-def within_square_distance_sklearn():
-    with_sq_dist = np.empty([0,0])
-    i = 0
-    while (i < len(pca_data)):
-         asigned_centroid = int(y_sklearnkmeans[i])
-         centr_val = sklearn_kmeans.cluster_centers_[asigned_centroid]
-         point_val = pca_data[i] 
-         i+=1
-         sqdist = np.linalg.norm(centr_val - point_val)**2
-         with_sq_dist = np.append(with_sq_dist, sqdist)              
-    return(sum(with_sq_dist))
-    
+        return("%.2f" % (sum(with_sq_dist)))
+            
 def remove_outliers():
     global pca_data
     X_train = pca_data
@@ -225,7 +216,6 @@ def ellbow_pca(components):
     test_array = np.empty([0])
     while(n<components):
         pca = PCA(n_components=n)
-        test = pca.fit_transform(filtered_data)
         variance = sum(pca.explained_variance_ratio_)
         n+=1
         test_array = np.append(test_array, variance)
