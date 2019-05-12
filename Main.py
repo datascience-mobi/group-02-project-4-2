@@ -237,8 +237,18 @@ pca(3, rmo=True)
 runtime_start()
 
 # Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
-kmeans("randnum", 3, 10, 0.1)
+# Console dialog
+print("Initial cluster generation method [randnum/randcell]?")
+stringa = str(input())
+print("k?")
+inta = int(input())
+print("Maximum iterations?")
+intb = int(input())
+print("Threshold for cluster movement?")
+floata = float(input())
 
+runtime_start()
+kmeans(stringa, inta, intb, floata)
 print("\nkmeans:")
 print(runtime_end())
 
@@ -259,15 +269,16 @@ y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
 print(runtime_end())
 plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=20, cmap='viridis')
 plt2.set_title('sklearn kmeans')
-pyplot.show()
 b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
 print("centroids: \n" + ' ' + b_str[1:-1])
 
 if dim == 3:
-    fig2 = pyplot.figure(figsize=[10,5], dpi=200)
+    fig2 = pyplot.figure(figsize=[20,10], dpi=200)
     plt21 = fig2.add_subplot(221, projection = '3d')
     plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
     plt21.set_title('3d kmeans')
     plt22 = fig2.add_subplot(222, projection = '3d')
     plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = y_sklearnkmeans, cmap='viridis')
     plt22.set_title('3D kmeans by sklearn')
+
+pyplot.show()
