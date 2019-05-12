@@ -179,10 +179,10 @@ def wss(where):
         i = 0
         while (i < len(pca_data)):
                 if where == "self":
-                    asigned_centroid = int(nearest_centroid[i,0])
+                    assigned_centroid = int(nearest_centroid[i,0])
                 if where == "sklearn":
-                    asigned_centroid = int(y_sklearnkmeans[i])
-                centr_val = centroids_array[asigned_centroid-1]
+                    assigned_centroid = int(y_sklearnkmeans[i])
+                centr_val = centroids_array[assigned_centroid-1]
                 point_val = pca_data[i] 
                 i+=1
                 sqdist = np.linalg.norm(centr_val - point_val)**2
