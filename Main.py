@@ -195,12 +195,13 @@ def remove_outliers():
     pca_data = X_train[np.where(y_pred_train == 1, True, False)]
 
 # PCA
-def pca(d):
+def pca(d, rmo=False):
     global dim, pca_data
     dim = d
     pca = PCA(n_components=dim)
     pca_data = pca.fit_transform(filtered_data)
-    remove_outliers()
+    if rmo == True:
+        remove_outliers()
     print("Sum of explained variances: ""%.2f" % (sum(pca.explained_variance_ratio_)) + "\n")
     # print(pca.singular_values_)
 
@@ -212,7 +213,7 @@ data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene
 # Filter useless data & Processing
 sc.pp.filter_genes(data, min_cells=1)
 filtered_data = np.array(data._X.todense())
-pca(3)
+pca(2, rmo=True)
 
 # Execute
 runtime_start()
