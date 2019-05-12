@@ -175,8 +175,8 @@ def kmeans(start, k1, n_iterations, t):
 
 # calculates sum of the squared distance in each cluster
 def wss(where):
-        with_sq_dist = np.empty([0,0])
         i = 0
+        wsssum = 0
         while (i < len(pca_data)):
                 if where == "self":
                     assigned_centroid = int(nearest_centroid[i,0])
@@ -186,8 +186,8 @@ def wss(where):
                 point_val = pca_data[i] 
                 i+=1
                 sqdist = np.linalg.norm(centr_val - point_val)**2
-                with_sq_dist = np.append(with_sq_dist, sqdist)              
-        return(sum(with_sq_dist))
+                wsssum += sqdist              
+        return(wsssum)
             
 def remove_outliers():
     global pca_data
