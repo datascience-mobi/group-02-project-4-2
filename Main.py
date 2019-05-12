@@ -174,22 +174,34 @@ def kmeans(start, k1, n_iterations, t):
     improv()
 
 # calculates sum of the squared distance in each cluster
-def within_square_distance():
+def within_square_distance_self():
         with_sq_dist = np.empty([0,0])
         i = 0
-        while (i < 1):
-                asigned_centroid = int(nearest_centroid[i-1,0])
-                centr_val = centroids_array[asigned_centroid]
+        while (i < len(pca_data)):
+                asigned_centroid = int(nearest_centroid[i,0])
+                centr_val = centroids_array[asigned_centroid-1]
                 point_val = pca_data[i] 
                 i+=1
                 sqdist = np.linalg.norm(centr_val - point_val)**2
                 with_sq_dist = np.append(with_sq_dist, sqdist)              
         return(sum(with_sq_dist))
+        
+def within_square_distance_sklearn():
+    with_sq_dist = np.empty([0,0])
+    i = 0
+    while (i < len(pca_data)):
+         asigned_centroid = int(y_sklearnkmeans[i])
+         centr_val = sklearn_kmeans.cluster_centers_[asigned_centroid]
+         point_val = pca_data[i] 
+         i+=1
+         sqdist = np.linalg.norm(centr_val - point_val)**2
+         with_sq_dist = np.append(with_sq_dist, sqdist)              
+    return(sum(with_sq_dist))
     
 def remove_outliers():
     global pca_data
     X_train = pca_data
-    clf = IsolationForest(max_samples=100, random_state=None, behaviour="new", contamination=.07)
+    clf = IsolationForest(behaviour="new", contamination=.07)
     clf.fit(X_train)
     y_pred_train = clf.predict(X_train)
     pca_data = X_train[np.where(y_pred_train == 1, True, False)]
@@ -205,6 +217,19 @@ def pca(d, rmo=False):
     print("Sum of explained variances: ""%.2f" % (sum(pca.explained_variance_ratio_)) + "\n")
     # print(pca.singular_values_)
 
+
+
+#Ellbow PCA
+def ellbow_pca(components):
+    n=0
+    test_array = np.empty([0])
+    while(n<components):
+        pca = PCA(n_components=n)
+        test = pca.fit_transform(filtered_data)
+        variance = sum(pca.explained_variance_ratio_)
+        n+=1
+        test_array = np.append(test_array, variance)
+    pyplot.plot(test_array)
 
 # General Code
 # Import data
