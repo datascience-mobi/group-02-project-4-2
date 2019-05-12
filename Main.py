@@ -228,10 +228,10 @@ data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene
 
 # Filter useless data & Processing
 sc.pp.filter_genes(data, min_cells=1)
-sc.pp.normalize_per_cell(data, counts_per_cell_after=1e4)
+sc.pp.normalize_total(data)
 sc.pp.log1p(data)
 filtered_data = np.array(data._X.todense())
-pca(2, rmo=True)
+pca(3, rmo=True)
 
 # Execute
 runtime_start()
