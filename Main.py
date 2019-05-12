@@ -101,12 +101,22 @@ def new_centroids():
     # "Masken" um values aus pca_data abzurufen
     nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
     nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
+
+    if dimensions ==3:
+        nearest_centroidpca1 = np.append(nearest_centroidpca1, zeros, axis=1)
+        nearest_centroidpca2 = np.append(nearest_centroidpca2, zeros, axis=1)
+        nearest_centroidpca3 = np.append(zeros, zeros, axis=1)
+        nearest_centroidpca3 = np.append(nearest_centroidpca3, nearest_centroid, axis=1)
     # while loop der für alle k cluster läuft:
     i = 1
     while i <= k:
         pca1 = np.mean(pca_data[nearest_centroidpca1 == i])
         pca2 = np.mean(pca_data[nearest_centroidpca2 == i])
-        centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
+        if dimensions == 3:
+            pca3 = np.mean(pca_data[nearest_centroidpca3 == i])
+            centroids_array = np.append(centroids_array, [[pca1, pca2, pca3]], axis=0)
+        else:
+            centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
         i += 1
 
 # Clustering threshold, centroid arrays have the dimension k, genes, repeat until distance is smaller than t
@@ -192,7 +202,8 @@ sc.pp.filter_genes(data, min_cells=1)
 filtered_data = np.array(data._X.todense())
 
 # PCA
-pca = PCA(n_components=2)
+dimensions = 3
+pca = PCA(n_components=dimensions)
 pca_data = pca.fit_transform(filtered_data)
 remove_outliers()
 print(sum(pca.explained_variance_ratio_))
@@ -228,3 +239,13 @@ plt2.set_title('sklearn kmeans')
 pyplot.show()
 b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
 print("centroids: \n" + ' ' + b_str[1:-1])
+
+if dimensions == 3:
+    fig2 = plt.figure(dpi = 200)
+    plt21 = fig2.add_subplot(111, projection = '3d')
+    plt21.scatter(pca_data[:, 0], pca_data[:, 1], pca_data[:, 2], c = nearest_centroid_squeeze, cmap='viridis')
+    plt21.set_title('3d kmeans')
+    fig3 = plt.figure(dpi = 200)
+    plt22 = fig3.add_subplot(111, projection = '3d')
+    plt22.scatter(pca_data[:, 0], pca_data[:, 1], pca_data[:, 2], c = y_sklearnkmeans, cmap='viridis')
+    plt22.set_title('3D kmeans by sklearn')
