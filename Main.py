@@ -124,7 +124,6 @@ def new_centroids():
 
 # Clustering threshold, centroid arrays have the dimension k, genes, repeat until distance is smaller than t
 def thresh(t1):
-    global centroids_array, centroids_oldarray, k
     t = t1  # Threshold to determine when algorithm is done
     i = 0
     c = 1 # Add counter to determine how many cycles have passed
@@ -163,17 +162,30 @@ def kmeans(start, k1, n_iterations, t):
 
     random_start_centroids(start)
     assign_centroids()
+
     if start == "randnum":
         empty_check()
+
     if t == None:
+
         while i < n_iterations:
             new_centroids()
             assign_centroids()
             i += 1
+
     else:
-        new_centroids()
-        assign_centroids()
-        thresh(t)
+        count = 0
+        d = t
+
+        while d >= t:
+            new_centroids()
+            assign_centroids()
+            d = np.linalg.norm(centroids_oldarray-centroids_array)
+            count+=1
+        print("%s iterations were performed" %count)
+        
+
+        #thresh(t)
     improv()
     print("\nkmeans:")
     print(runtime_end())
