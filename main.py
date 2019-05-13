@@ -122,7 +122,7 @@ def new_centroids():
         i += 1
 
 # Function giving distance between clusters after n iterations            
-def improv():      
+def improv():
     global centroids_array, centroids_oldarray, k
     distances = []
     i = 0
