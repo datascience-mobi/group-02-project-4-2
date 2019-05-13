@@ -1,7 +1,7 @@
 # Import libraries
 import numpy as np
 import pandas
-import matplotlib.pyplot as pyplot
+import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import scanpy as sc
 from datetime import datetime
@@ -9,6 +9,7 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.ensemble import IsolationForest
 from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import axes3d
 
 # Global Variables
 t1 = 0
@@ -220,7 +221,7 @@ def ellbow_pca(components):
         variance = sum(pca.explained_variance_ratio_)
         n+=1
         test_array = np.append(test_array, variance)
-    pyplot.plot(test_array)
+    plt.plot(test_array)
 
 # General Code
 # Import data
@@ -253,7 +254,7 @@ print("\nkmeans:")
 print(runtime_end())
 
 # plotting
-fig = pyplot.figure(1, figsize=[10, 5], dpi=200)
+fig = plt.figure(1, figsize=[10, 5], dpi=200)
 plt1, plt2 = fig.subplots(1, 2)
 nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
 plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=20, cmap='viridis')
@@ -273,7 +274,7 @@ b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmean
 print("centroids: \n" + ' ' + b_str[1:-1])
 
 if dim == 3:
-    fig2 = pyplot.figure(figsize=[20,10], dpi=200)
+    fig2 = plt.figure(figsize=[20,10], dpi=200)
     plt21 = fig2.add_subplot(221, projection = '3d')
     plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
     plt21.set_title('3d kmeans')
@@ -281,4 +282,16 @@ if dim == 3:
     plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = y_sklearnkmeans, cmap='viridis')
     plt22.set_title('3D kmeans by sklearn')
 
-pyplot.show()
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+#rotating 3d plot (close the other 3d plot for it to run better)
+ax.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
+
+# rotate the axes and update
+for angle in range(0, 360):
+    ax.view_init(30, angle)
+    plt.draw()
+    plt.pause(.0001)
+
+plt.show()
