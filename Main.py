@@ -121,26 +121,6 @@ def new_centroids():
             centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
         i += 1
 
-
-# Clustering threshold, centroid arrays have the dimension k, genes, repeat until distance is smaller than t
-def thresh(t1):
-    t = t1  # Threshold to determine when algorithm is done
-    i = 0
-    c = 1 # Add counter to determine how many cycles have passed
-    while i < k: 
-        a = centroids_array[i,:]
-        b = centroids_oldarray[i,:]
-        d = np.linalg.norm(a-b)
-        if d < t:
-            i += 1 
-        elif d >= t:
-            new_centroids()
-            assign_centroids()
-            c += 1
-    print (str(c) + " iterations were performed")
-    # Können wir wenn wir wollen dann ans ende von kmeans packen anstelle des while loops
-
-
 # Function giving distance between clusters after n iterations            
 def improv():      
     global centroids_array, centroids_oldarray, k
@@ -192,7 +172,6 @@ def kmeans(start, k1, n_iterations, t):
     a_str = np.array2string(centroids_array[np.argsort(centroids_array[:, 0])], precision=2, separator=' ')
     print("centroids: \n" + ' ' + a_str[1:-1])
 
-
 # calculates sum of the squared distance in each cluster
 def wss(where):
         i = 0
@@ -218,7 +197,6 @@ def remove_outliers():
     y_pred_train = clf.predict(X_train)
     pca_data = X_train[np.where(y_pred_train == 1, True, False)]
 
-
 # PCA
 def pca(d, rmo=False):
     global dim, pca_data
@@ -229,7 +207,6 @@ def pca(d, rmo=False):
         remove_outliers()
     print("Sum of explained variances: ""%.2f" % (sum(pca.explained_variance_ratio_)) + "\n")
     # print(pca.singular_values_)
-
 
 
 #Ellbow PCA
@@ -294,7 +271,6 @@ sc.pp.filter_genes(data, min_cells=1)
 sc.pp.normalize_total(data)
 sc.pp.log1p(data)
 filtered_data = np.array(data._X.todense())
-pca(3, rmo=True)
 
 # Execute
 # Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
@@ -307,12 +283,6 @@ pca(3, rmo=True)
 # intb = int(input())
 # print("Threshold for cluster movement?")
 # floata = float(input())
-
-kmeans('randnum', 3, 30, 0.001)
-
-sklearn_kmeans()
-
-plots()
 
 
 #fig = plt.figure()
