@@ -10,18 +10,6 @@ from sklearn.cluster import KMeans
 from sklearn.ensemble import IsolationForest
 from mpl_toolkits.mplot3d import Axes3D
 
-# Global Variables
-t1 = 0
-pbmcs = 0
-genes = 0
-centroids_array = 0
-nearest_centroid = 0
-k = 0
-dim = 0
-pca_data = []
-tg = 0
-sklearn_kmeans = 0
-
 
 # Functions
 # Define distance function which takes integer inputs which identify cell and centroid
