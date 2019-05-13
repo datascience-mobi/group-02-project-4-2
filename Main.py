@@ -237,18 +237,18 @@ pca(3, rmo=True)
 runtime_start()
 
 # Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
-# Console dialog
-print("Initial cluster generation method [randnum/randcell]?")
-stringa = str(input())
-print("k?")
-inta = int(input())
-print("Maximum iterations?")
-intb = int(input())
-print("Threshold for cluster movement?")
-floata = float(input())
+# Console dialog LEAVE COMMENTED UNTIL THE VERY END
+# print("Initial cluster generation method [randnum/randcell]?")
+# stringa = str(input())
+# print("k?")
+# inta = int(input())
+# print("Maximum iterations?")
+# intb = int(input())
+# print("Threshold for cluster movement?")
+# floata = float(input())
 
 runtime_start()
-kmeans(stringa, inta, intb, floata)
+kmeans('randnum', 3, 30, 0.001)
 print("\nkmeans:")
 print(runtime_end())
 
