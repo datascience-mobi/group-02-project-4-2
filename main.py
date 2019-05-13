@@ -20,6 +20,7 @@ k = 0
 dim = 0
 pca_data = []
 tg = 0
+sklearn_kmeans = 0
 
 
 # Functions
@@ -172,6 +173,7 @@ def kmeans(start, k1, n_iterations, t):
     print(runtime_end())
     a_str = np.array2string(centroids_array[np.argsort(centroids_array[:, 0])], precision=2, separator=' ')
     print("centroids: \n" + ' ' + a_str[1:-1])
+    print("wss: " + str(wss('self')))
 
 # calculates sum of the squared distance in each cluster
 def wss(where):
@@ -180,13 +182,14 @@ def wss(where):
         while (i < len(pca_data)):
                 if where == "self":
                     assigned_centroid = int(nearest_centroid[i,0])
+                    centr_val = centroids_array[assigned_centroid-1]
                 if where == "sklearn":
                     assigned_centroid = int(y_sklearnkmeans[i])
-                centr_val = centroids_array[assigned_centroid-1]
+                    centr_val = sklearn_kmeans.cluster_centers_[assigned_centroid]
                 point_val = pca_data[i] 
                 i+=1
                 sqdist = np.linalg.norm(centr_val - point_val)**2
-                wsssum += sqdist              
+                wsssum += np.trunc(sqdist)              
         return(wsssum)
 
 
@@ -223,8 +226,8 @@ def ellbow_pca(components):
     plt.plot(test_array)
 
 
-def sklearn_kmeans():
-    global y_sklearnkmeans
+def sklearn_kmeans_function():
+    global y_sklearnkmeans, sklearn_kmeans
     runtime_start()
     sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
     y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
@@ -232,6 +235,7 @@ def sklearn_kmeans():
     print(runtime_end())
     b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
     print("centroids: \n" + ' ' + b_str[1:-1])
+    print("wss: " + str(wss('sklearn')))
 
 
 def plots():
