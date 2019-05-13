@@ -164,8 +164,6 @@ def kmeans(start, k1, n_iterations, t):
             count+=1
         print("%s iterations were performed" %count)
         
-
-        #thresh(t)
     improv()
     print("\nkmeans:")
     print(runtime_end())
