@@ -249,7 +249,7 @@ def plots():
     
     # 3D plots
     if dim == 3:
-        fig2 = plt.figure(figsize=[20,10], dpi=200)
+        fig2 = plt.figure(figsize=[15,10], dpi=200)
 
         # Kmeans
         plt21 = fig2.add_subplot(221, projection = '3d')
