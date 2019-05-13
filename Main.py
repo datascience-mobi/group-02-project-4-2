@@ -9,7 +9,6 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.ensemble import IsolationForest
 from mpl_toolkits.mplot3d import Axes3D
-from mpl_toolkits.mplot3d import axes3d
 
 # Global Variables
 t1 = 0
@@ -122,6 +121,7 @@ def new_centroids():
             centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
         i += 1
 
+
 # Clustering threshold, centroid arrays have the dimension k, genes, repeat until distance is smaller than t
 def thresh(t1):
     global centroids_array, centroids_oldarray, k
@@ -159,6 +159,8 @@ def kmeans(start, k1, n_iterations, t):
     global k
     k = k1
     i = 0
+    runtime_start()
+
     random_start_centroids(start)
     assign_centroids()
     if start == "randnum":
@@ -173,6 +175,11 @@ def kmeans(start, k1, n_iterations, t):
         assign_centroids()
         thresh(t)
     improv()
+    print("\nkmeans:")
+    print(runtime_end())
+    a_str = np.array2string(centroids_array[np.argsort(centroids_array[:, 0])], precision=2, separator=' ')
+    print("centroids: \n" + ' ' + a_str[1:-1])
+
 
 # calculates sum of the squared distance in each cluster
 def wss(where):
@@ -189,7 +196,8 @@ def wss(where):
                 sqdist = np.linalg.norm(centr_val - point_val)**2
                 wsssum += sqdist              
         return(wsssum)
-            
+
+
 def remove_outliers():
     global pca_data
     X_train = pca_data
@@ -197,6 +205,7 @@ def remove_outliers():
     clf.fit(X_train)
     y_pred_train = clf.predict(X_train)
     pca_data = X_train[np.where(y_pred_train == 1, True, False)]
+
 
 # PCA
 def pca(d, rmo=False):
@@ -223,6 +232,47 @@ def ellbow_pca(components):
         test_array = np.append(test_array, variance)
     plt.plot(test_array)
 
+
+def sklearn_kmeans():
+    global y_sklearnkmeans
+    runtime_start()
+    sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
+    y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
+    print("\nsklearn kmeans:")
+    print(runtime_end())
+    b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
+    print("centroids: \n" + ' ' + b_str[1:-1])
+
+
+def plots():
+    # 2D plots:
+    
+    # Kmeans
+    fig1 = plt.figure(1, figsize=[10, 5], dpi=200)
+    plt1, plt2 = fig1.subplots(1, 2)
+    nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
+    plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=20, cmap='viridis')
+    plt1.set_title('kmeans')
+    
+    # Sklearnkmeans
+    plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=20, cmap='viridis')
+    plt2.set_title('sklearn kmeans')
+    
+    # 3D plots
+    if dim == 3:
+        fig2 = plt.figure(figsize=[20,10], dpi=200)
+
+        # Kmeans
+        plt21 = fig2.add_subplot(221, projection = '3d')
+        plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
+        plt21.set_title('3d kmeans')
+
+        # Sklearnkmeans
+        plt22 = fig2.add_subplot(222, projection = '3d')
+        plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = y_sklearnkmeans, cmap='viridis')
+        plt22.set_title('3D kmeans by sklearn')
+
+
 # General Code
 # Import data
 data = sc.read_10x_mtx('./data/filtered_gene_bc_matrices/hg19/', var_names='gene_symbols', cache=True)
@@ -235,8 +285,6 @@ filtered_data = np.array(data._X.todense())
 pca(3, rmo=True)
 
 # Execute
-runtime_start()
-
 # Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
 # Console dialog LEAVE COMMENTED UNTIL THE VERY END
 # print("Initial cluster generation method [randnum/randcell]?")
@@ -248,50 +296,23 @@ runtime_start()
 # print("Threshold for cluster movement?")
 # floata = float(input())
 
-runtime_start()
 kmeans('randnum', 3, 30, 0.001)
-print("\nkmeans:")
-print(runtime_end())
 
-# plotting
-fig = plt.figure(1, figsize=[10, 5], dpi=200)
-plt1, plt2 = fig.subplots(1, 2)
-nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
-plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=20, cmap='viridis')
-plt1.set_title('kmeans')
-a_str = np.array2string(centroids_array[np.argsort(centroids_array[:, 0])], precision=2, separator=' ')
-print("centroids: \n" + ' ' + a_str[1:-1])
+sklearn_kmeans()
 
-# sklearn comparison
-print("\nsklearn kmeans:")
-runtime_start()
-sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
-y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
-print(runtime_end())
-plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=20, cmap='viridis')
-plt2.set_title('sklearn kmeans')
-b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
-print("centroids: \n" + ' ' + b_str[1:-1])
+plots()
 
-if dim == 3:
-    fig2 = plt.figure(figsize=[20,10], dpi=200)
-    plt21 = fig2.add_subplot(221, projection = '3d')
-    plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
-    plt21.set_title('3d kmeans')
-    plt22 = fig2.add_subplot(222, projection = '3d')
-    plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = y_sklearnkmeans, cmap='viridis')
-    plt22.set_title('3D kmeans by sklearn')
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+#fig = plt.figure()
+#ax = fig.add_subplot(111, projection='3d')
 
-#rotating 3d plot (close the other 3d plot for it to run better)
-ax.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
+##rotating 3d plot (close the other 3d plot for it to run better)
+#ax.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
 
-# rotate the axes and update
-for angle in range(0, 360):
-    ax.view_init(30, angle)
-    plt.draw()
-    plt.pause(.0001)
+## rotate the axes and update
+#for angle in range(0, 360):#
+    #ax.view_init(30, angle)
+    #plt.draw()
+    #plt.pause(.0001)
 
-plt.show()
+#plt.show()
