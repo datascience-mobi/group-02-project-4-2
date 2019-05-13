@@ -19,6 +19,7 @@ nearest_centroid = 0
 k = 0
 dim = 0
 pca_data = []
+tg = 0
 
 
 # Functions
@@ -123,20 +124,22 @@ def new_centroids():
 
 # Function giving distance between clusters after n iterations            
 def improv():
-    global centroids_array, centroids_oldarray, k
+    global centroids_array, centroids_oldarray, k, tg
     distances = []
     i = 0
     while i < k: 
         d = np.linalg.norm(centroids_array[i, :] - centroids_oldarray[i,:])
         distances.append(d)
         i += 1
-    c_str = np.array2string(np.array(distances), precision=2)
-    print("Distances of clusters as compared to last generation: \n" + str(c_str))
- 
+    if tg == None:
+        c_str = np.array2string(np.array(distances), precision=2)
+        print("Distances of clusters as compared to last generation: \n" + str(c_str))
+  
 
 def kmeans(start, k1, n_iterations, t):
-    global k
+    global k, tg
     k = k1
+    tg = t
     i = 0
     runtime_start()
 
