@@ -113,22 +113,19 @@ def new_centroids():
 
 # Function giving distance between clusters after n iterations            
 def improv():
-    global centroids_array, centroids_oldarray, k, tg
     distances = []
     i = 0
     while i < k: 
         d = np.linalg.norm(centroids_array[i, :] - centroids_oldarray[i,:])
         distances.append(d)
         i += 1
-    if tg == None:
-        c_str = np.array2string(np.array(distances), precision=2)
-        print("Distances of clusters as compared to last generation: \n" + str(c_str))
+    c_str = np.array2string(np.array(distances), precision=2)
+    print("Distances of clusters as compared to last generation: \n" + str(c_str))
   
 
 def kmeans(start, k1, n_iterations, t):
-    global k, tg
+    global k
     k = k1
-    tg = t
     i = 0
     runtime_start()
 
@@ -144,6 +141,7 @@ def kmeans(start, k1, n_iterations, t):
             new_centroids()
             assign_centroids()
             i += 1
+        improv()
 
     else:
         count = 0
@@ -156,7 +154,7 @@ def kmeans(start, k1, n_iterations, t):
             count+=1
         print("%s iterations were performed" %count)
         
-    improv()
+
     print("\nkmeans:")
     print(runtime_end())
     a_str = np.array2string(centroids_array[np.argsort(centroids_array[:, 0])], precision=2, separator=' ')
@@ -211,8 +209,12 @@ def ellbow_pca(components):
         variance = sum(pca.explained_variance_ratio_)
         n+=1
         test_array = np.append(test_array, variance)
-    plt.plot(test_array)
 
+    plt.plot(test_array)
+    plt.xlabel('n PCA')
+    plt.ylabel('explained variance')
+    plt.show()
+    
 
 def sklearn_kmeans_function():
     global y_sklearnkmeans, sklearn_kmeans
@@ -230,14 +232,15 @@ def plots():
     # 2D plots:
     
     # Kmeans
+    global nearest_centroid_squeeze
     fig1 = plt.figure(1, figsize=[10, 5], dpi=200)
     plt1, plt2 = fig1.subplots(1, 2)
     nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
-    plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=20, cmap='viridis')
+    plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=5, cmap='gist_rainbow')
     plt1.set_title('kmeans')
     
     # Sklearnkmeans
-    plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=20, cmap='viridis')
+    plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=5, cmap='gist_rainbow')
     plt2.set_title('sklearn kmeans')
     
     # 3D plots
@@ -246,12 +249,12 @@ def plots():
 
         # Kmeans
         plt21 = fig2.add_subplot(221, projection = '3d')
-        plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
+        plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=5, c = nearest_centroid_squeeze, cmap='gist_rainbow')
         plt21.set_title('3d kmeans')
 
         # Sklearnkmeans
         plt22 = fig2.add_subplot(222, projection = '3d')
-        plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = y_sklearnkmeans, cmap='viridis')
+        plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=5, c = y_sklearnkmeans, cmap='gist_rainbow')
         plt22.set_title('3D kmeans by sklearn')
 
 
@@ -278,16 +281,15 @@ filtered_data = np.array(data._X.todense())
 # floata = float(input())
 
 
-#fig = plt.figure()
-#ax = fig.add_subplot(111, projection='3d')
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# #rotating 3d plot (close the other 3d plot for it to run better)
+# ax.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='gist_rainbow')
 
-##rotating 3d plot (close the other 3d plot for it to run better)
-#ax.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], c = nearest_centroid_squeeze, cmap='viridis')
+# # rotate the axes and update
+# for angle in range(0, 360):
+#     ax.view_init(30, angle)
+#     plt.draw()
+#     plt.pause(.1)
 
-## rotate the axes and update
-#for angle in range(0, 360):#
-    #ax.view_init(30, angle)
-    #plt.draw()
-    #plt.pause(.0001)
-
-#plt.show()
+# plt.show()
