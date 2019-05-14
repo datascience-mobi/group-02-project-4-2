@@ -201,15 +201,14 @@ def pca(d, rmo=False):
 
 #Ellbow PCA
 def ellbow_pca(components):
-    n=0
     test_array = np.empty([0])
-    while(n<components):
-        pca = PCA(n_components=n)
-        pca.fit_transform(filtered_data)
-        variance = sum(pca.explained_variance_ratio_)
-        n+=1
+    pca = PCA(n_components=components)
+    pca.fit_transform(filtered_data)
+    n = 0
+    while(n <= components):
+        variance = sum(pca.explained_variance_ratio_[0:n])
         test_array = np.append(test_array, variance)
-
+        n+=1
     plt.plot(test_array)
     plt.xlabel('n PCA')
     plt.ylabel('explained variance')
