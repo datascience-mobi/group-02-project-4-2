@@ -232,12 +232,12 @@ def plots():
     plt1, plt2 = fig1.subplots(1, 2)
     nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
     plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=5, cmap='gist_rainbow')
-    plt1.plot(centroids_array[:, 0], centroids_array[:, 1], markersize=10, marker="x", linestyle='None')
+    plt1.plot(centroids_array[:, 0], centroids_array[:, 1], markersize=5, marker="s", linestyle='None', c='w')
     plt1.set_title('kmeans')
     
     # Sklearnkmeans
     plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=5, cmap='gist_rainbow')
-    plt2.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], markersize=10, marker="x", linestyle='None')
+    plt2.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], markersize=5, marker="s", linestyle='None', c='w')
     plt2.set_title('sklearn kmeans')
     
     # 3D plots
@@ -247,13 +247,13 @@ def plots():
         # Kmeans
         plt21 = fig2.add_subplot(221, projection = '3d')
         plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=5, c = nearest_centroid_squeeze, cmap='gist_rainbow')
-        plt21.plot(centroids_array[:, 0], centroids_array[:, 1], centroids_array[:, 2], markersize=10, marker="x", linestyle='None')
+        plt21.plot(centroids_array[:, 0], centroids_array[:, 1], centroids_array[:, 2], markersize=5, marker="s", linestyle='None', c='w')
         plt21.set_title('3d kmeans')
 
         # Sklearnkmeans
         plt22 = fig2.add_subplot(222, projection = '3d')
         plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=5, c = y_sklearnkmeans, cmap='gist_rainbow')
-        plt22.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], sklearn_kmeans.cluster_centers_[:, 2], markersize=10, marker="x", linestyle='None')
+        plt22.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], sklearn_kmeans.cluster_centers_[:, 2], markersize=5, marker="s", linestyle='None', c='w')
         plt22.set_title('3D kmeans by sklearn')
 
 
