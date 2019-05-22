@@ -22,7 +22,7 @@ def runtime_end():
     t2 = datetime.now().time()
     fmt = '%H:%M:%S.%f'
     elapsed = str(datetime.strptime(str(t2), fmt) - datetime.strptime(str(t1), fmt))
-    return str("runtime: " + elapsed)
+    return str("\truntime: " + elapsed)
 
 
 def random_start_centroids(starttype):
@@ -157,9 +157,7 @@ def kmeans(start, k1, n_iterations, t):
 
     print("\nkmeans:")
     print(runtime_end())
-    a_str = np.array2string(centroids_array[np.argsort(centroids_array[:, 0])], precision=2, separator=' ')
-    print("centroids: \n" + ' ' + a_str[1:-1])
-    print("wss: " + str(wss('self')))
+    print("\twss: " + str(wss('self')))
 
 # calculates sum of the squared distance in each cluster
 def wss(where):
@@ -222,9 +220,7 @@ def sklearn_kmeans_function():
     y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
     print("\nsklearn kmeans:")
     print(runtime_end())
-    b_str = np.array2string(sklearn_kmeans.cluster_centers_[np.argsort(sklearn_kmeans.cluster_centers_[:, 0])], precision=2, separator=' ')
-    print("centroids: \n" + ' ' + b_str[1:-1])
-    print("wss: " + str(wss('sklearn')))
+    print("\twss: " + str(wss('sklearn')))
 
 
 def plots():
@@ -236,10 +232,12 @@ def plots():
     plt1, plt2 = fig1.subplots(1, 2)
     nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
     plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=5, cmap='gist_rainbow')
+    plt1.plot(centroids_array[:, 0], centroids_array[:, 1], markersize=10, marker="x", linestyle='None')
     plt1.set_title('kmeans')
     
     # Sklearnkmeans
     plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=5, cmap='gist_rainbow')
+    plt2.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], markersize=10, marker="x", linestyle='None')
     plt2.set_title('sklearn kmeans')
     
     # 3D plots
@@ -249,11 +247,13 @@ def plots():
         # Kmeans
         plt21 = fig2.add_subplot(221, projection = '3d')
         plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=5, c = nearest_centroid_squeeze, cmap='gist_rainbow')
+        plt21.plot(centroids_array[:, 0], centroids_array[:, 1], centroids_array[:, 2], markersize=10, marker="x", linestyle='None')
         plt21.set_title('3d kmeans')
 
         # Sklearnkmeans
         plt22 = fig2.add_subplot(222, projection = '3d')
         plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=5, c = y_sklearnkmeans, cmap='gist_rainbow')
+        plt22.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], sklearn_kmeans.cluster_centers_[:, 2], markersize=10, marker="x", linestyle='None')
         plt22.set_title('3D kmeans by sklearn')
 
 
