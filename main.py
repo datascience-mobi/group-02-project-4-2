@@ -225,7 +225,7 @@ def plots():
     plt2.set_title('sklearn kmeans')
     
     # 3D plots
-    if dim == 3:
+    if dim >= 3:
         fig2 = plt.figure(figsize=[15,10], dpi=200)
 
         # Kmeans
