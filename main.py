@@ -86,29 +86,15 @@ def dist(cell_point, cluster_number):
 
 
 def new_centroids():
-    global centroids_array, centroids_oldarray
+    global centroids_array, centroids_oldarray, nearest_centroid_squeeze
     centroids_oldarray = centroids_array # create copy of old array for threshold funcion
-    zeros = np.zeros([pbmcs, 1])
+    nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
     centroids_array = np.empty([0, genes])
-    # "Masken" um values aus pca_data abzurufen
-    nearest_centroidpca1 = np.append(nearest_centroid, zeros, axis=1)
-    nearest_centroidpca2 = np.append(zeros, nearest_centroid, axis=1)
 
-    if dim ==3:
-        nearest_centroidpca1 = np.append(nearest_centroidpca1, zeros, axis=1)
-        nearest_centroidpca2 = np.append(nearest_centroidpca2, zeros, axis=1)
-        nearest_centroidpca3 = np.append(zeros, zeros, axis=1)
-        nearest_centroidpca3 = np.append(nearest_centroidpca3, nearest_centroid, axis=1)
-    # while loop der für alle k cluster läuft:
     i = 1
     while i <= k:
-        pca1 = np.mean(pca_data[nearest_centroidpca1 == i])
-        pca2 = np.mean(pca_data[nearest_centroidpca2 == i])
-        if dim == 3:
-            pca3 = np.mean(pca_data[nearest_centroidpca3 == i])
-            centroids_array = np.append(centroids_array, [[pca1, pca2, pca3]], axis=0)
-        else:
-            centroids_array = np.append(centroids_array, [[pca1, pca2]], axis=0)
+        calc_means = np.mean(pca_data[nearest_centroid_squeeze == i], axis = 0)
+        centroids_array = np.append(centroids_array, np.expand_dims(calc_means, axis = 0), axis = 0)
         i += 1
 
 # Function giving distance between clusters after n iterations            
@@ -227,10 +213,8 @@ def plots():
     # 2D plots:
     
     # Kmeans
-    global nearest_centroid_squeeze
     fig1 = plt.figure(1, figsize=[10, 5], dpi=200)
     plt1, plt2 = fig1.subplots(1, 2)
-    nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
     plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=5, cmap='gist_rainbow')
     plt1.plot(centroids_array[:, 0], centroids_array[:, 1], markersize=10, marker="x", linestyle='None')
     plt1.set_title('kmeans')
@@ -292,3 +276,8 @@ filtered_data = np.array(data._X.todense())
 #     plt.pause(.1)
 
 # plt.show()
+
+pca(5, rmo=True)
+kmeans('randnum', 3, 10, 0.00001)
+sklearn_kmeans_function()
+plots()
