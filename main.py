@@ -27,7 +27,7 @@ def runtime_end():
 
 def random_start_centroids(starttype):
     # Create Centroid Array by randomly picking k pbmcs from data
-    global centroids_array, pbmcs, genes
+    global centroids_array, genes
     pbmcs = pca_data.shape[0]
     genes = pca_data.shape[1]
     centroids_array = np.empty([0, genes])
@@ -46,15 +46,20 @@ def random_start_centroids(starttype):
             pca_data)
 
 
-def assign_centroids():
-    global nearest_centroid, pbmcs
+def dist(cell_point, cluster_number):
+
+    return np.linalg.norm(pca_data[cell_point, :] - centroids_array[cluster_number - 1, :])
+
+
+def assign_centroids(data_array):
+    global nearest_centroid
     # Assign closest Centroid
-    # Loop über alle Punkte
     i = 0
-    pbmcs = pca_data.shape[0]
-    nearest_centroid = np.zeros([pbmcs, 1])
+    array_dim1 = data_array.shape[0]
+    nearest_centroid = np.zeros([array_dim1, 1])
     
-    while i < pbmcs:
+    # Loop über alle Punkte
+    while i < array_dim1:
         sml_distance = 0
 
         # While loop selecting every centroid
@@ -75,16 +80,9 @@ def empty_check():
         if list(nearest_centroid).count(i + 1) == 0:
             print("Empty cluster! Correcting centroids.")
             random_start_centroids("randnum")
-            assign_centroids()
+            assign_centroids(pca_data)
             empty_check()
         i += 1
-
-
-def dist(cell_point, cluster_number):
-    a = pca_data[cell_point, :]
-    b = centroids_array[cluster_number - 1, :]
-    d = np.linalg.norm(a - b)
-    return d
 
 
 def new_centroids():
@@ -118,7 +116,7 @@ def kmeans(start, k1, n_iterations, t):
     runtime_start()
 
     random_start_centroids(start)
-    assign_centroids()
+    assign_centroids(pca_data)
 
     if start == "randnum":
         empty_check()
@@ -127,7 +125,7 @@ def kmeans(start, k1, n_iterations, t):
 
         while i < n_iterations:
             new_centroids()
-            assign_centroids()
+            assign_centroids(pca_data)
             i += 1
         improv()
 
@@ -137,7 +135,7 @@ def kmeans(start, k1, n_iterations, t):
 
         while d >= t:
             new_centroids()
-            assign_centroids()
+            assign_centroids(pca_data)
             d = np.linalg.norm(centroids_oldarray-centroids_array)
             count+=1
         print("%s iterations were performed" %count)
@@ -148,23 +146,20 @@ def kmeans(start, k1, n_iterations, t):
     print("\twss: " + str(wss('self')))
 
 def minibatch(k1, n_iterations, b):
-    global k, pca_data, nearest_centroid_squeeze, pca_data_copy, bg, n_iterationsg, centroids_array, cnnew
+    global k, pca_data, nearest_centroid_squeeze, pca_data, bg, n_iterationsg, centroids_array, cnnew
     k = k1
     bg = b
     n_iterationsg = n_iterations
     runtime_start()
     v = np.zeros((k, 1))
-    cnnew = np.empty([])
-    pca_data_copy = pca_data
     j = 1
-    pca_data = pca_data_copy[np.random.randint(pca_data_copy.shape[0], size=b), :]
     random_start_centroids("randcell")
     cnnew = centroids_array
     while (j <= n_iterations):
         # Reduce data to batch
-        pca_data = pca_data_copy[np.random.randint(pca_data_copy.shape[0], size=b), :]
+        pca_batch = pca_data[np.random.randint(pca_data.shape[0], size=b), :]
         # Start centroids
-        assign_centroids()
+        assign_centroids(pca_batch)
         i = 0
         while (i < b):
             c = cnnew[int(nearest_centroid[i, 0])-1, :]
@@ -174,9 +169,8 @@ def minibatch(k1, n_iterations, b):
             i+=1
         j+=1
 
-    pca_data = pca_data_copy
     centroids_array = cnnew
-    assign_centroids()
+    assign_centroids(pca_data)
     nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
     print("\nMINI-BATCH:")
     print("\nkmeans:")
@@ -240,21 +234,20 @@ def ellbow_pca(components):
     
 
 def sklearn_kmeans_function(var):
-    global y_sklearnkmeans, sklearn_kmeans, pca_data_copy
+    global y_sklearnkmeans, sklearn_kmeans, pca_data
     runtime_start()
     if var == "reg":
-        pca_data_copy = pca_data
-        sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data_copy)
+        pca_data = pca_data
+        sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
     if var == "mini":
-        sklearn_kmeans = MiniBatchKMeans(init='random',n_clusters=k, max_iter=n_iterationsg, batch_size=bg).fit(pca_data_copy)
-    y_sklearnkmeans = sklearn_kmeans.predict(pca_data_copy)
+        sklearn_kmeans = MiniBatchKMeans(init='random',n_clusters=k, max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
+    y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
     print("\nsklearn kmeans:")
     print(runtime_end())
     print("\twss: " + str(wss('sklearn')))
 
 
 def plots(add):
-    global pca_data_copy
     # 2D plots:
     if add == "mini":
         additional = " (mini-batch)"
@@ -268,7 +261,7 @@ def plots(add):
     plt1.set_title('kmeans' + additional)
     
     # Sklearnkmeans
-    plt2.scatter(pca_data_copy[:, 0], pca_data_copy[:, 1], c=y_sklearnkmeans, s=0.5, cmap='gist_rainbow')
+    plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=0.5, cmap='gist_rainbow')
     plt2.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], markersize=5, marker="s", linestyle='None', c='w')
     plt2.set_title('sklearn kmeans' + additional)
     
@@ -284,7 +277,7 @@ def plots(add):
 
         # Sklearnkmeans
         plt22 = fig2.add_subplot(222, projection = '3d')
-        plt22.scatter(pca_data_copy[:, 1], pca_data_copy[:, 2], pca_data_copy[:, 0], s=2, c = y_sklearnkmeans, cmap='gist_rainbow')
+        plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=2, c = y_sklearnkmeans, cmap='gist_rainbow')
         plt22.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], sklearn_kmeans.cluster_centers_[:, 2], markersize=5, marker="s", linestyle='None', c='w')
         plt22.set_title('3D kmeans by sklearn' + additional)
 
