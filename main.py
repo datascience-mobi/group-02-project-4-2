@@ -113,11 +113,14 @@ def kmeans(start, k1, n_iterations, t):
     global k
     k = k1
     i = 0
-    
     runtime_start()
 
     random_start_centroids(start)
+<<<<<<< HEAD
     assign_centroids(pca_data)
+=======
+    assign_centroids()
+>>>>>>> parent of e5203ec... Ellbow cluster
 
     if start == "randnum":
         empty_check()
@@ -140,6 +143,7 @@ def kmeans(start, k1, n_iterations, t):
             d = np.linalg.norm(centroids_oldarray-centroids_array)
             count+=1
         print("%s iterations were performed" %count)
+        
 
     print("\nkmeans:")
     print(runtime_end())
@@ -196,29 +200,6 @@ def wss(where):
             wsssum += np.trunc(sqdist)              
         return(wsssum)
 
-def ellbow_cluster(where , clusters = 2):
-    k = 1
-    lmao = 0
-    array = np.empty([0])
-    while (k<= clusters):
-        if where == "self":
-            kmeans("randcell", k, 20, 0.00001)
-            lmao = wss("self")
-            print(wss("self"))
-        if where == "sklearn":
-           sklearn_kmeans_function(k)
-           lmao = wss("sklearn") 
-        array2 = [lmao]
-        array = np.append(array,array2)
-        
-        k+=1
-    print(array)
-    plt.plot( array)
-    plt.show()
-
-
-
-
 
 def remove_outliers():
     global pca_data
@@ -256,8 +237,13 @@ def ellbow_pca(components):
     plt.show()
     
 
+<<<<<<< HEAD
 def sklearn_kmeans_function(var):
     global y_sklearnkmeans, sklearn_kmeans, pca_data
+=======
+def sklearn_kmeans_function():
+    global y_sklearnkmeans, sklearn_kmeans
+>>>>>>> parent of e5203ec... Ellbow cluster
     runtime_start()
     if var == "reg":
         pca_data = pca_data
@@ -359,4 +345,13 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
+<<<<<<< HEAD
 cluster(variant = 'kmeans', hd=False, k=10)
+=======
+# plt.show()
+
+pca(5, rmo=True)
+kmeans('randnum', 3, 10, 0.00001)
+sklearn_kmeans_function()
+plots()
+>>>>>>> parent of e5203ec... Ellbow cluster
