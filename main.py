@@ -247,12 +247,11 @@ def sklearn_kmeans_function(var):
     print("\twss: " + str(wss('sklearn')))
 
 
-def plots(add):
+def plots(add = ""):
     # 2D plots:
+    additional = ""
     if add == "mini":
         additional = " (mini-batch)"
-    if add == "":
-        additional = ""
     # Kmeans
     fig1 = plt.figure(1, figsize=[10, 5], dpi=200)
     plt1, plt2 = fig1.subplots(1, 2)
@@ -293,7 +292,7 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randnum', k = 3, max_
             assign_centroids(pca_data)
             vr = np.squeeze(nearest_centroid.astype(int))
         if hd == False:
-            plots("")
+            plots()
     if variant == "mini" or hd == True:
         minibatch(k, max_iterations, batch_size)
         sklearn_kmeans_function("mini")
@@ -337,4 +336,4 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
-cluster(variant = 'mini', batch_size=200, max_iterations=50, hd=True)
+cluster(variant = 'kmeans')
