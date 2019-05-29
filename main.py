@@ -281,7 +281,7 @@ def plots(add = ""):
         plt22.set_title('3D kmeans by sklearn' + additional)
 
 
-def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randnum', k = 3, max_iterations = 10, threshold = 0.00001, batch_size = 2000, hd = False):
+def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max_iterations = 10, threshold = 0.00001, batch_size = 2000, hd = False):
     global nearest_centroid_squeeze, centroids_array
     pca(pcas, rmo)
     if variant == "kmeans" or hd == True:
@@ -336,4 +336,4 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
-cluster(variant = 'kmeans')
+cluster(variant = 'kmeans', hd=False, k=10)
