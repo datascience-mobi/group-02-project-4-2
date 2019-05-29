@@ -291,8 +291,7 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randnum', k = 3, max_
         if hd == True:
             centroids_array = centroids_array[centroids_array[:,0].argsort()]
             assign_centroids(pca_data)
-            v1 = np.squeeze(nearest_centroid.astype(int))
-            v2 = y_sklearnkmeans
+            vr = np.squeeze(nearest_centroid.astype(int))
         if hd == False:
             plots("")
     if variant == "mini" or hd == True:
@@ -301,12 +300,11 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randnum', k = 3, max_
         if hd == True:
             centroids_array = centroids_array[centroids_array[:,0].argsort()]
             assign_centroids(pca_data)
-            v3 = np.squeeze(nearest_centroid.astype(int))
-            v4 = y_sklearnkmeans
+            vm = np.squeeze(nearest_centroid.astype(int))
         if hd == False:
             plots("mini")
     if hd == True:
-        vn = np.where(np.subtract(v1, v3) == 0)[0]
+        vn = np.where(np.subtract(vr, vm) == 0)[0]
         nearest_centroid_squeeze = np.squeeze(np.zeros(np.size(nearest_centroid)).astype(int))
         np.put(nearest_centroid_squeeze, vn, 1)
 
