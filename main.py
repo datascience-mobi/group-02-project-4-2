@@ -238,7 +238,7 @@ def sklearn_kmeans_function(var):
     runtime_start()
     if var == "reg":
         pca_data = pca_data
-        sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
+        sklearn_kmeans = KMeans(init='random', n_clusters=k).fit(pca_data)
     if var == "mini":
         sklearn_kmeans = MiniBatchKMeans(init='random',n_clusters=k, max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
     y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
