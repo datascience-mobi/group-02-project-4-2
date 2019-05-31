@@ -247,6 +247,7 @@ def sklearn_kmeans_function(var):
 
 
 def plots(add = ""):
+    global fig1, fig2
     # 2D plots:
     additional = ""
     if add == "mini":
@@ -265,7 +266,7 @@ def plots(add = ""):
     
     # 3D plots
     if dim >= 3:
-        fig2 = plt.figure(figsize=[15,10], dpi=200)
+        fig2 = plt.figure(2, figsize=[15,10], dpi=200)
 
         # Kmeans
         plt21 = fig2.add_subplot(221, projection = '3d')
@@ -286,33 +287,38 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
     if variant == "kmeans" or hd == True:
         kmeans(start, k, max_iterations, threshold)
         sklearn_kmeans_function("reg")
+        
         if hd == True:
             centroids_array = centroids_array[centroids_array[:,0].argsort()]
             assign_centroids(pca_data)
             vr = np.squeeze(nearest_centroid.astype(int))
+        
         if hd == False:
             plots()
+
     if variant == "mini" or hd == True:
         minibatch(k, max_iterations, batch_size)
         sklearn_kmeans_function("mini")
+        
         if hd == True:
             centroids_array = centroids_array[centroids_array[:,0].argsort()]
             assign_centroids(pca_data)
             vm = np.squeeze(nearest_centroid.astype(int))
         if hd == False:
             plots("mini")
+
     if hd == True:
         vn = np.where(np.subtract(vr, vm) == 0)[0]
         nearest_centroid_squeeze = np.squeeze(np.zeros(np.size(nearest_centroid)).astype(int))
         np.put(nearest_centroid_squeeze, vn, 1)
 
-        fig3 = plt.figure(1, figsize=[5, 5], dpi=200)
+        fig3 = plt.figure(3, figsize=[5, 5], dpi=200)
         plt3 = fig3.subplots(1)
         plt3.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=0.5, cmap=colors.ListedColormap(['red', 'white']))
         plt3.set_title('differences')
 
 
-
+    
 
 # General Code
 # Import data
