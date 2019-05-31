@@ -260,7 +260,7 @@ def sklearn_kmeans_function(var, k):
     if var == "kmeans":
         sklearn_kmeans = KMeans(init='random', n_clusters=k).fit(pca_data)
     if var == "mini":
-        sklearn_kmeans = MiniBatchKMeans(init='random',n_clusters=k, max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
+        sklearn_kmeans = MiniBatchKMeans(n_clusters=k, init = 'random', max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
     y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
     print("\nsklearn kmeans:")
     print(runtime_end())
@@ -268,6 +268,7 @@ def sklearn_kmeans_function(var, k):
 
 
 def plots(add = ""):
+    global fig1, fig2
     # 2D plots:
     additional = ""
     if add == "mini":
@@ -286,7 +287,7 @@ def plots(add = ""):
     
     # 3D plots
     if dim >= 3:
-        fig2 = plt.figure(figsize=[15,10], dpi=200)
+        fig2 = plt.figure(2, figsize=[15,10], dpi=200)
 
         # Kmeans
         plt21 = fig2.add_subplot(221, projection = '3d')
@@ -311,8 +312,10 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
             centroids_array = centroids_array[centroids_array[:,0].argsort()]
             assign_centroids(pca_data)
             vr = np.squeeze(nearest_centroid.astype(int))
+        
         if hd == False:
             plots()
+
     if variant == "mini" or hd == True:
         minibatch(k, max_iterations, batch_size)
         sklearn_kmeans_function("mini",k)
@@ -322,18 +325,19 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
             vm = np.squeeze(nearest_centroid.astype(int))
         if hd == False:
             plots("mini")
+
     if hd == True:
         vn = np.where(np.subtract(vr, vm) == 0)[0]
         nearest_centroid_squeeze = np.squeeze(np.zeros(np.size(nearest_centroid)).astype(int))
         np.put(nearest_centroid_squeeze, vn, 1)
 
-        fig1 = plt.figure(1, figsize=[5, 5], dpi=200)
-        plt1 = fig1.subplots(1)
-        plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=0.5, cmap=colors.ListedColormap(['red', 'white']))
-        plt1.set_title('differences')
+        fig3 = plt.figure(3, figsize=[5, 5], dpi=200)
+        plt3 = fig3.subplots(1)
+        plt3.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=0.5, cmap=colors.ListedColormap(['red', 'white']))
+        plt3.set_title('differences')
 
 
-
+    
 
 # General Code
 # Import data
@@ -356,4 +360,5 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
-cluster(variant = 'kmeans', hd=False, k=3, max_iterations=20)
+cluster(variant = 'kmeans', hd=False, k=3)
+
