@@ -116,7 +116,11 @@ def kmeans(start, k1, n_iterations, t):
     runtime_start()
 
     random_start_centroids(start)
+<<<<<<< HEAD
     assign_centroids(pca_data)
+=======
+    assign_centroids()
+>>>>>>> parent of e5203ec... Ellbow cluster
 
     if start == "randnum":
         empty_check()
@@ -233,8 +237,13 @@ def ellbow_pca(components):
     plt.show()
     
 
+<<<<<<< HEAD
+def sklearn_kmeans_function(var):
+    global y_sklearnkmeans, sklearn_kmeans, pca_data
+=======
 def sklearn_kmeans_function():
     global y_sklearnkmeans, sklearn_kmeans
+>>>>>>> parent of e5203ec... Ellbow cluster
     runtime_start()
     if var == "reg":
         pca_data = pca_data
@@ -336,4 +345,13 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
+<<<<<<< HEAD
 cluster(variant = 'kmeans', hd=False, k=10)
+=======
+# plt.show()
+
+pca(5, rmo=True)
+kmeans('randnum', 3, 10, 0.00001)
+sklearn_kmeans_function()
+plots()
+>>>>>>> parent of e5203ec... Ellbow cluster
