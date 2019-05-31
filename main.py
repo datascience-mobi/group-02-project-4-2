@@ -231,14 +231,34 @@ def ellbow_pca(components):
     plt.xlabel('n PCA')
     plt.ylabel('explained variance')
     plt.show()
-    
 
-def sklearn_kmeans_function():
-    global y_sklearnkmeans, sklearn_kmeans
+def ellbow_cluster(where = "self", clusters = 4, var = "kmeans"):
+    k = 1
+    sq_dist = 0
+    sq_dist_array = np.empty([0])
+    while (k<= clusters):
+        if var == "mini":
+            minibatch(k, 10, 2000)
+            sq_dist = wss("self")
+            
+        if where == "self":
+            kmeans("randcell", k, 20, 0.00001)
+            sq_dist = wss("self")
+        if where == "sklearn":
+           sklearn_kmeans_function(var,k)
+           sq_dist = wss("sklearn") 
+        sq_dist_array = np.append(sq_dist_array,sq_dist)
+        
+        k+=1
+    print(sq_dist_array)
+    plt.plot( sq_dist_array)
+    plt.show()    
+
+def sklearn_kmeans_function(var, k):
+    global y_sklearnkmeans, sklearn_kmeans, pca_data
     runtime_start()
-    if var == "reg":
-        pca_data = pca_data
-        sklearn_kmeans = KMeans(init='random', n_clusters=var).fit(pca_data)
+    if var == "kmeans":
+        sklearn_kmeans = KMeans(init='random', n_clusters=k).fit(pca_data)
     if var == "mini":
         sklearn_kmeans = MiniBatchKMeans(init='random',n_clusters=k, max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
     y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
@@ -286,7 +306,7 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
     pca(pcas, rmo)
     if variant == "kmeans" or hd == True:
         kmeans(start, k, max_iterations, threshold)
-        sklearn_kmeans_function("reg")
+        sklearn_kmeans_function("kmeans",k)
         if hd == True:
             centroids_array = centroids_array[centroids_array[:,0].argsort()]
             assign_centroids(pca_data)
@@ -295,7 +315,7 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
             plots()
     if variant == "mini" or hd == True:
         minibatch(k, max_iterations, batch_size)
-        sklearn_kmeans_function("mini")
+        sklearn_kmeans_function("mini",k)
         if hd == True:
             centroids_array = centroids_array[centroids_array[:,0].argsort()]
             assign_centroids(pca_data)
@@ -336,4 +356,4 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
-cluster(variant = 'kmeans', hd=False, k=10)
+cluster(variant = 'kmeans', hd=False, k=3, max_iterations=20)
