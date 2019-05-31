@@ -4,10 +4,9 @@ import pandas
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import scanpy as sc
-from matplotlib import colors
 from datetime import datetime
 from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans, MiniBatchKMeans
+from sklearn.cluster import KMeans
 from sklearn.ensemble import IsolationForest
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -28,7 +27,7 @@ def runtime_end():
 
 def random_start_centroids(starttype):
     # Create Centroid Array by randomly picking k pbmcs from data
-    global centroids_array, genes
+    global centroids_array, pbmcs, genes
     pbmcs = pca_data.shape[0]
     genes = pca_data.shape[1]
     centroids_array = np.empty([0, genes])
@@ -46,20 +45,14 @@ def random_start_centroids(starttype):
         centroids_array = (np.amax(pca_data) - np.amin(pca_data)) * np.random.random_sample((k, genes)) + np.amin(
             pca_data)
 
-def dist(cell_point, cluster_number):
 
-    return np.linalg.norm(pca_data[cell_point, :] - centroids_array[cluster_number - 1, :])
-
-
-def assign_centroids(data_array):
+def assign_centroids():
     global nearest_centroid
     # Assign closest Centroid
-    i = 0
-    array_dim1 = data_array.shape[0]
-    nearest_centroid = np.zeros([array_dim1, 1])
-    
     # Loop über alle Punkte
-    while i < array_dim1:
+    i = 0
+    nearest_centroid = np.zeros([pbmcs, 1])
+    while i < pbmcs:
         sml_distance = 0
 
         # While loop selecting every centroid
@@ -80,9 +73,16 @@ def empty_check():
         if list(nearest_centroid).count(i + 1) == 0:
             print("Empty cluster! Correcting centroids.")
             random_start_centroids("randnum")
-            assign_centroids(pca_data)
+            assign_centroids()
             empty_check()
         i += 1
+
+
+def dist(cell_point, cluster_number):
+    a = pca_data[cell_point, :]
+    b = centroids_array[cluster_number - 1, :]
+    d = np.linalg.norm(a - b)
+    return d
 
 
 def new_centroids():
@@ -117,8 +117,7 @@ def kmeans(start, k1, n_iterations, t):
     runtime_start()
 
     random_start_centroids(start)
-    assign_centroids(pca_data)
-
+    assign_centroids()
     if start == "randnum":
         empty_check()
 
@@ -126,7 +125,7 @@ def kmeans(start, k1, n_iterations, t):
 
         while i < n_iterations:
             new_centroids()
-            assign_centroids(pca_data)
+            assign_centroids()
             i += 1
         improv()
 
@@ -136,7 +135,7 @@ def kmeans(start, k1, n_iterations, t):
 
         while d >= t:
             new_centroids()
-            assign_centroids(pca_data)
+            assign_centroids()
             d = np.linalg.norm(centroids_oldarray-centroids_array)
             count+=1
         print("%s iterations were performed" %count)
@@ -145,55 +144,21 @@ def kmeans(start, k1, n_iterations, t):
     print(runtime_end())
     print("\twss: " + str(wss('self')))
 
-def minibatch(k1, n_iterations, b):
-    global k, pca_data, nearest_centroid_squeeze, pca_data, bg, n_iterationsg, centroids_array, cnnew
-    k = k1
-    bg = b
-    n_iterationsg = n_iterations
-    runtime_start()
-    v = np.zeros((k, 1))
-    j = 1
-    random_start_centroids("randcell")
-    cnnew = centroids_array
-    while (j <= n_iterations):
-        # Reduce data to batch
-        pca_batch = pca_data[np.random.randint(pca_data.shape[0], size=b), :]
-        # Start centroids
-        assign_centroids(pca_batch)
-        i = 0
-        while (i < b):
-            c = cnnew[int(nearest_centroid[i, 0])-1, :]
-            v[int((nearest_centroid[i, 0]-1)), 0] =  int(v[int((nearest_centroid[i, 0]-1)), 0]) + 1
-            n = 1/v[int((nearest_centroid[i, 0]-1)), 0]
-            cnnew[int(nearest_centroid[i, 0])-1, :] = c * (1-n) + pca_data[i, :] * n
-            i+=1
-        j+=1
-
-    centroids_array = cnnew
-    assign_centroids(pca_data)
-    nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
-    print("\nMINI-BATCH:")
-    print("\nkmeans:")
-    print(runtime_end())
-    print("\twss: " + str(wss('self')))
-        
-
-
 # calculates sum of the squared distance in each cluster
 def wss(where):
         i = 0
         wsssum = 0
         while (i < len(pca_data)):
-            if where == "self":
-                assigned_centroid = int(nearest_centroid[i,0])
-                centr_val = centroids_array[assigned_centroid-1]
-            if where == "sklearn":
-                assigned_centroid = int(y_sklearnkmeans[i])
-                centr_val = sklearn_kmeans.cluster_centers_[assigned_centroid]
-            point_val = pca_data[i] 
-            i+=1
-            sqdist = np.linalg.norm(centr_val - point_val)**2
-            wsssum += np.trunc(sqdist)              
+                if where == "self":
+                    assigned_centroid = int(nearest_centroid[i,0])
+                    centr_val = centroids_array[assigned_centroid-1]
+                if where == "sklearn":
+                    assigned_centroid = int(y_sklearnkmeans[i])
+                    centr_val = sklearn_kmeans.cluster_centers_[assigned_centroid]
+                point_val = pca_data[i] 
+                i+=1
+                sqdist = np.linalg.norm(centr_val - point_val)**2
+                wsssum += np.trunc(sqdist)              
         return(wsssum)
 
 def ellbow_cluster(where , clusters = 2):
@@ -256,36 +221,30 @@ def ellbow_pca(components):
     plt.show()
     
 
-def sklearn_kmeans_function(var):
-    global y_sklearnkmeans, sklearn_kmeans, pca_data
+def sklearn_kmeans_function(k):
+    global y_sklearnkmeans, sklearn_kmeans
     runtime_start()
-    if var == "reg":
-        pca_data = pca_data
-        sklearn_kmeans = KMeans(init='random', n_clusters=var).fit(pca_data)
-    if var == "mini":
-        sklearn_kmeans = MiniBatchKMeans(init='random',n_clusters=k, max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
+    sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
     y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
     print("\nsklearn kmeans:")
     print(runtime_end())
     print("\twss: " + str(wss('sklearn')))
 
 
-def plots(add = ""):
+def plots():
     # 2D plots:
-    additional = ""
-    if add == "mini":
-        additional = " (mini-batch)"
+    
     # Kmeans
     fig1 = plt.figure(1, figsize=[10, 5], dpi=200)
     plt1, plt2 = fig1.subplots(1, 2)
-    plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=0.5, cmap='gist_rainbow')
+    plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=5, cmap='gist_rainbow')
     plt1.plot(centroids_array[:, 0], centroids_array[:, 1], markersize=5, marker="s", linestyle='None', c='w')
-    plt1.set_title('kmeans' + additional)
+    plt1.set_title('kmeans')
     
     # Sklearnkmeans
-    plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=0.5, cmap='gist_rainbow')
+    plt2.scatter(pca_data[:, 0], pca_data[:, 1], c=y_sklearnkmeans, s=5, cmap='gist_rainbow')
     plt2.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], markersize=5, marker="s", linestyle='None', c='w')
-    plt2.set_title('sklearn kmeans' + additional)
+    plt2.set_title('sklearn kmeans')
     
     # 3D plots
     if dim >= 3:
@@ -293,49 +252,15 @@ def plots(add = ""):
 
         # Kmeans
         plt21 = fig2.add_subplot(221, projection = '3d')
-        plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=2, c = nearest_centroid_squeeze, cmap='gist_rainbow')
+        plt21.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=5, c = nearest_centroid_squeeze, cmap='gist_rainbow')
         plt21.plot(centroids_array[:, 0], centroids_array[:, 1], centroids_array[:, 2], markersize=5, marker="s", linestyle='None', c='w')
-        plt21.set_title('3d kmeans' + additional)
+        plt21.set_title('3d kmeans')
 
         # Sklearnkmeans
         plt22 = fig2.add_subplot(222, projection = '3d')
-        plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=2, c = y_sklearnkmeans, cmap='gist_rainbow')
+        plt22.scatter(pca_data[:, 1], pca_data[:, 2], pca_data[:, 0], s=5, c = y_sklearnkmeans, cmap='gist_rainbow')
         plt22.plot(sklearn_kmeans.cluster_centers_[:, 0], sklearn_kmeans.cluster_centers_[:, 1], sklearn_kmeans.cluster_centers_[:, 2], markersize=5, marker="s", linestyle='None', c='w')
-        plt22.set_title('3D kmeans by sklearn' + additional)
-
-
-def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max_iterations = 10, threshold = 0.00001, batch_size = 2000, hd = False):
-    global nearest_centroid_squeeze, centroids_array
-    pca(pcas, rmo)
-    if variant == "kmeans" or hd == True:
-        kmeans(start, k, max_iterations, threshold)
-        sklearn_kmeans_function("reg")
-        if hd == True:
-            centroids_array = centroids_array[centroids_array[:,0].argsort()]
-            assign_centroids(pca_data)
-            vr = np.squeeze(nearest_centroid.astype(int))
-        if hd == False:
-            plots()
-    if variant == "mini" or hd == True:
-        minibatch(k, max_iterations, batch_size)
-        sklearn_kmeans_function("mini")
-        if hd == True:
-            centroids_array = centroids_array[centroids_array[:,0].argsort()]
-            assign_centroids(pca_data)
-            vm = np.squeeze(nearest_centroid.astype(int))
-        if hd == False:
-            plots("mini")
-    if hd == True:
-        vn = np.where(np.subtract(vr, vm) == 0)[0]
-        nearest_centroid_squeeze = np.squeeze(np.zeros(np.size(nearest_centroid)).astype(int))
-        np.put(nearest_centroid_squeeze, vn, 1)
-
-        fig1 = plt.figure(1, figsize=[5, 5], dpi=200)
-        plt1 = fig1.subplots(1)
-        plt1.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=0.5, cmap=colors.ListedColormap(['red', 'white']))
-        plt1.set_title('differences')
-
-
+        plt22.set_title('3D kmeans by sklearn')
 
 
 # General Code
@@ -348,6 +273,19 @@ sc.pp.normalize_total(data)
 sc.pp.log1p(data)
 filtered_data = np.array(data._X.todense())
 
+# Execute
+# Startpoint selection [randnum oder randpat], Clusters, Iterations (egal wenn t), Threshhold [float oder None]
+# Console dialog LEAVE COMMENTED UNTIL THE VERY END
+# print("Initial cluster generation method [randnum/randcell]?")
+# stringa = str(input())
+# print("k?")
+# inta = int(input())
+# print("Maximum iterations?")
+# intb = int(input())
+# print("Threshold for cluster movement?")
+# floata = float(input())
+
+
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')
 # #rotating 3d plot (close the other 3d plot for it to run better)
@@ -359,4 +297,9 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
-cluster(variant = 'kmeans', hd=False, k=10)
+# plt.show()
+
+pca(2, rmo=True)
+kmeans('randcell', 3, 10, 0.00001)
+sklearn_kmeans_function(3)
+plots()
