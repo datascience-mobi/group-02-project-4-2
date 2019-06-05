@@ -1,0 +1,21 @@
+Wed May 29 12:51:30 2019    results.cprof
+
+         12981693 function calls (12926593 primitive calls) in 11.355 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   3476/1    0.059    0.000   11.357   11.357 {built-in method builtins.exec}
+        1    0.016    0.016   11.357   11.357 main.py:2(<module>)
+        1    0.000    0.000    7.134    7.134 main.py:284(cluster)
+        1    0.000    0.000    5.938    5.938 main.py:112(kmeans)
+       30    0.494    0.016    5.903    0.197 main.py:54(assign_centroids)
+   912114    1.747    0.000    5.409    0.000 main.py:49(dist)
+        1    0.000    0.000    0.906    0.906 main.py:209(pca)
+        1    0.000    0.000    0.287    0.287 main.py:200(remove_outliers)
+        1    0.000    0.000    0.133    0.133 main.py:250(plots)
+        2    0.026    0.013    0.048    0.024 main.py:183(wss)
+       29    0.006    0.000    0.012    0.000 main.py:88(new_centroids)
+        2    0.000    0.000    0.001    0.000 main.py:22(runtime_end)
+        1    0.000    0.000    0.000    0.000 main.py:29(random_start_centroids)
+        2    0.000    0.000    0.000    0.000 main.py:17(runtime_start)
