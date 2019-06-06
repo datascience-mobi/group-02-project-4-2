@@ -28,9 +28,8 @@ def runtime_end():
 
 def random_start_centroids(starttype):
     # Create Centroid Array by randomly picking k pbmcs from data
-    global centroids_array, genes, pbmcs, genes
-    pbmcs = pca_data.shape[0]
-    genes = pca_data.shape[1]
+    global centroids_array
+    
     centroids_array = np.empty([0, genes])
 
     if starttype == "randcell":
@@ -48,6 +47,8 @@ def random_start_centroids(starttype):
     
     elif starttype == "k++":
         kppcentroids()
+    
+    return centroids_array
 
 def dist(cell_point, cluster_number):
 
