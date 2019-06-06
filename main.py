@@ -102,6 +102,7 @@ def new_centroids():
 
 def kppcentroids():
     global centroids_array, dist_array, prob_array
+    pbmcs = pca_data.shape[0]
     first_centroid = np.random.randint(pbmcs, size=1)
     i = 0
     centroids_array = np.append(centroids_array, pca_data[first_centroid, :], axis=0)
