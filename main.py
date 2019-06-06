@@ -288,13 +288,19 @@ def ellbow_cluster(where = "self", clusters = 4, var = "kmeans"):
     plt.plot( sq_dist_array)
     plt.show()    
 
-def sklearn_kmeans_function(var, k):
+def sklearn_kmeans_function(var, k, start):
     global y_sklearnkmeans, sklearn_kmeans, pca_data
     runtime_start()
-    if var == "kmeans":
-        sklearn_kmeans = KMeans(init='random', n_clusters=k).fit(pca_data)
-    if var == "mini":
-        sklearn_kmeans = MiniBatchKMeans(n_clusters=k, init = 'random', max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
+    if start == "randcell" or start == "randnum": 
+        if var == "kmeans":
+            sklearn_kmeans = KMeans(init='random', n_clusters=k).fit(pca_data)
+        if var == "mini":
+            sklearn_kmeans = MiniBatchKMeans(n_clusters=k, init = 'random', max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
+    if start == "k++": 
+        if var == "kmeans":
+            sklearn_kmeans = KMeans(n_clusters=k).fit(pca_data)
+        if var == "mini":
+            sklearn_kmeans = MiniBatchKMeans(n_clusters=k, max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
     y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
     print("\nsklearn kmeans:")
     print(runtime_end())
@@ -343,12 +349,12 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
     else:
         if variant == "kmeans":
             kmeans(start, k, max_iterations, threshold)
-            sklearn_kmeans_function("kmeans",k)
+            sklearn_kmeans_function("kmeans", k, start)
             plots()
 
         if variant == "mini":
             minibatch(k, max_iterations, batch_size)
-            sklearn_kmeans_function("mini",k)
+            sklearn_kmeans_function("mini", k, start)
             plots("mini")
 
 
