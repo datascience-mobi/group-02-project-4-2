@@ -1,0 +1,59 @@
+## 1. Getting familiar (week 1)
+* Integrate and learn to use Jupyter Notebook, Numpy, Scanpy, Panda, Matplotlib and Visual Studio Code
+* Understand the raw given data utilizing Visual Studio Code 
+    * Filtering ?
+    * array or matrix ?
+    * many zeros, why ?
+* Understanding the k-means algorithm 
+* Create timeline presentation (check, if each subgroup needs to do one)
+* First tries at implementing the basic k-means algorithm in Python
+    * How to access specific data from np.matrix or np.array ?
+    * Maximum number of runs ?
+    * What sort of mean ?
+    * Create centroid class with Centroids as arrays
+    * Centroids with random values (in expression range) or random samples ?
+
+## 2. Basic k-means (week 2)
+* Improve rough draft
+    * Already acomplished -> associate every patient to closest random cluster (arrays)
+    * to do :
+        * pandas dataframe ?
+        * PCA, auf varianz testen vielleciht vor clustering, sklearn pca, variance threshold (0) ebenfalls
+        * Maybe create clusters as arrays
+        * find new centroids of clusters (by means)
+            * problem: mean function goes over array of all clusters, we need an array for each seperate clusters ?
+                * maybe create a Cluster Class  (maybe as feature)
+                * dataframe über pandas, oder numpy indexing: lables über X = np.zero((5,20)), X [labels == 3]
+                * 
+               
+            * then check if we can loop this bitch
+* apply code on data set
+* compare with sklearn code 
+* Debug if necessary
+* Improve timeline presentation if necessary
+    * was müssen wir mit dne daten machen, wie sind sie gut verarbeitbar
+    * 4 Unterpunkte, jeweils ~2,5 min
+        * Wie sehen die gegebenen Daten aus
+        * Was haben wir mit den Daten gemacht (PCA,Matrix zu array) was können wir vielleicht noch machen
+        * bisherige fortschritte
+        * Aussichten für andere unterprojekte, weiterer Zeitplan
+
+## 3. Mini-batch k-means (week 3)
+* add code to basic k-means reducing the samples randomly
+* compare with sklearn code
+* debug/improve if necessary
+
+## 4. K-means++ (week 4)
+* Understanding k-means++ and D^2 method
+* first tries at implementing k-means ++
+
+## 5. K-means++(week 5)
+* Improve k-means++
+* compare with sklearn code
+* debug/improve if necessary
+
+## 6. Bonus Task ? (week 6)
+## 7. Clean up (week 7)
+* make code pretty and comprehensible
+* create final presentation
+* celebrate
