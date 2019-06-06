@@ -28,8 +28,9 @@ def runtime_end():
 
 def random_start_centroids(starttype):
     # Create Centroid Array by randomly picking k pbmcs from data
-    global centroids_array, genes
-
+    global centroids_array, genes, pbmcs, genes
+    pbmcs = pca_data.shape[0]
+    genes = pca_data.shape[1]
     centroids_array = np.empty([0, genes])
 
     if starttype == "randcell":
