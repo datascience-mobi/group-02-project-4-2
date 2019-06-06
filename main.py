@@ -169,8 +169,8 @@ def kmeans(start, k1, n_iterations, t):
             count+=1
         print("%s iterations were performed" %count)
         
-
-    print("\nkmeans:")
+    print("\nKMEANS:")
+    print("\ngroup 4_2 algorithm:")
     print(runtime_end())
     print("\twss: " + str(wss('self')))
 
@@ -202,7 +202,7 @@ def minibatch(k1, n_iterations, b):
     assign_centroids(pca_data)
     nearest_centroid_squeeze = np.squeeze(nearest_centroid.astype(int))
     print("\nMINI-BATCH:")
-    print("\nkmeans:")
+    print("\ngroup 4_2 algorithm:")
     print(runtime_end())
     print("\twss: " + str(wss('self')))
         
@@ -332,38 +332,49 @@ def plots(add = ""):
 
 
 def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max_iterations = 10, threshold = 0.00001, batch_size = 2000, hd = False):
-    global nearest_centroid_squeeze, centroids_array
     pca(pcas, rmo)
-    if variant == "kmeans" or hd == True:
-        kmeans(start, k, max_iterations, threshold)
-        sklearn_kmeans_function("kmeans",k)
-        if hd == True:
-            centroids_array = centroids_array[centroids_array[:,0].argsort()]
-            assign_centroids(pca_data)
-            vr = np.squeeze(nearest_centroid.astype(int))
-        
-        if hd == False:
+    if hd == True:
+        highlightdiffs(start, k , max_iterations, threshold, batch_size)
+    else:
+        if variant == "kmeans":
+            kmeans(start, k, max_iterations, threshold)
+            sklearn_kmeans_function("kmeans",k)
             plots()
 
-    if variant == "mini" or hd == True:
-        minibatch(k, max_iterations, batch_size)
-        sklearn_kmeans_function("mini",k)
-        if hd == True:
-            centroids_array = centroids_array[centroids_array[:,0].argsort()]
-            assign_centroids(pca_data)
-            vm = np.squeeze(nearest_centroid.astype(int))
-        if hd == False:
+        if variant == "mini":
+            minibatch(k, max_iterations, batch_size)
+            sklearn_kmeans_function("mini",k)
             plots("mini")
 
-    if hd == True:
-        vn = np.where(np.subtract(vr, vm) == 0)[0]
-        nearest_centroid_squeeze = np.squeeze(np.zeros(np.size(nearest_centroid)).astype(int))
-        np.put(nearest_centroid_squeeze, vn, 1)
 
-        fig3 = plt.figure(3, figsize=[5, 5], dpi=200)
-        plt3 = fig3.subplots(1)
-        plt3.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=0.5, cmap=colors.ListedColormap(['red', 'white']))
-        plt3.set_title('differences')
+def highlightdiffs(start, k, max_iterations, threshold, batch_size):
+    global nearest_centroid_squeeze, centroids_array
+
+    # Performing KMeans clustering and saving results
+    kmeans(start, k, max_iterations, threshold)
+    centroids_array = centroids_array[centroids_array[:,0].argsort()]
+    assign_centroids(pca_data)
+    vr = np.squeeze(nearest_centroid.astype(int))
+
+    # Performing Mini-Batch KMeans clustering and saving results
+    minibatch(k, max_iterations, batch_size)
+    centroids_array = centroids_array[centroids_array[:,0].argsort()]
+    assign_centroids(pca_data)
+    vm = np.squeeze(nearest_centroid.astype(int))
+
+    # Compare results of both algorithms and find differences
+    vn = np.where(np.subtract(vr, vm) == 0)[0]
+    nearest_centroid_squeeze = np.squeeze(np.zeros(np.size(nearest_centroid)).astype(int))
+    np.put(nearest_centroid_squeeze, vn, 1)
+
+    # Plot
+    fig3 = plt.figure(3, figsize=[5, 5], dpi=200)
+    plt3 = fig3.subplots(1)
+    plt3.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=0.5, cmap=colors.ListedColormap(['red', 'white']))
+    plt3.set_title('differences')
+
+
+
 
 
     
