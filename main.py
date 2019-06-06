@@ -98,7 +98,7 @@ def new_centroids():
         i += 1
 
 def Kppcentroids(k = 3):
-    global centroids_array, pbmcs, genes
+    global centroids_array, pbmcs, genes, dist_array
     pbmcs = pca_data.shape[0]
     genes = pca_data.shape[1]
     centroids_array = np.empty([0, genes])
@@ -108,21 +108,23 @@ def Kppcentroids(k = 3):
     print(first_centroid, centroids_array)
     dist_array = np.empty ([0,pbmcs])
     j = 0
-    l = 0
+    
     
     while i < k:
+        z = centroids_array.shape[0] + 1 #+1 weil die dist function clusternumber -1 macht
         while j < pbmcs:
-            z = centroids_array.shape[0]
             sml_distance = 0
+            l = 1
             while l < z:
-                if sml_distance == 0 or dist(l, j) < sml_distance:
-                    sml_distance = dist(l , j)
+                if sml_distance == 0 or dist(j, l) < sml_distance:
+                    sml_distance = dist(j, l)
                 l += 1
             dist_array = np.append(dist_array,sml_distance **2)        
             j += 1
+        #centroids_array um neuen centroid erweitern
         i += 1
     print(dist_array.shape)
-    return(dist_array)
+    return(dist_array) # array mit der minimalen quadrierten distanz von jeder pbmcs zum nächsten centroid
 
 # Function giving distance between clusters after n iterations            
 def improv():
