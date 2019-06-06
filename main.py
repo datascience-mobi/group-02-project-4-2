@@ -279,7 +279,7 @@ def ellbow_cluster(where = "self", clusters = 4, var = "kmeans"):
             kmeans("randcell", k, 20, 0.00001)
             sq_dist = wss("self")
         if where == "sklearn":
-           sklearn_kmeans_function(var,k)
+           sklearn_kmeans_function(var,k,"randcell")
            sq_dist = wss("sklearn") 
         sq_dist_array = np.append(sq_dist_array,sq_dist)
         
