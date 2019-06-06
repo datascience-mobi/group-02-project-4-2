@@ -45,6 +45,9 @@ def random_start_centroids(starttype):
     elif starttype == "randnum":
         centroids_array = (np.amax(pca_data) - np.amin(pca_data)) * np.random.random_sample((k, genes)) + np.amin(
             pca_data)
+    
+    elif starttype == "k++":
+        kppcentroids()
 
 def dist(cell_point, cluster_number):
 
@@ -97,34 +100,32 @@ def new_centroids():
         centroids_array = np.append(centroids_array, np.expand_dims(calc_means, axis = 0), axis = 0)
         i += 1
 
-def Kppcentroids(k = 3):
-    global centroids_array, pbmcs, genes, dist_array
-    pbmcs = pca_data.shape[0]
-    genes = pca_data.shape[1]
-    centroids_array = np.empty([0, genes])
+def kppcentroids():
+    global centroids_array, dist_array, prob_array
     first_centroid = np.random.randint(pbmcs, size=1)
-    i = 1
+    i = 0
     centroids_array = np.append(centroids_array, pca_data[first_centroid, :], axis=0)
-    print(first_centroid, centroids_array)
     dist_array = np.empty ([0,pbmcs])
+    prob_array = np.empty ([0,pbmcs])
     j = 0
-    
-    
-    while i < k:
+     
+    while i < k - 1:
         z = centroids_array.shape[0] + 1 #+1 weil die dist function clusternumber -1 macht
         while j < pbmcs:
-            sml_distance = 0
-            l = 1
+            sml_distance = -1
+            l = 1 # wieder weil die cluster number -1 ist
             while l < z:
-                if sml_distance == 0 or dist(j, l) < sml_distance:
+                if sml_distance == -1 or dist(j, l) < sml_distance:
                     sml_distance = dist(j, l)
                 l += 1
             dist_array = np.append(dist_array,sml_distance **2)        
             j += 1
         #centroids_array um neuen centroid erweitern
+        prob_array = dist_array / np.sum(dist_array)
+        s = np.random.choice(pbmcs,p = prob_array )
+        centroids_array = np.append(centroids_array, np.expand_dims(pca_data[s, :], axis=0), axis=0)
         i += 1
-    print(dist_array.shape)
-    return(dist_array) # array mit der minimalen quadrierten distanz von jeder pbmcs zum nächsten centroid
+    return (centroids_array)
 
 # Function giving distance between clusters after n iterations            
 def improv():
@@ -355,6 +356,7 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
         if hd == False:
             plots("mini")
 
+
     if hd == True:
         vn = np.where(np.subtract(vr, vm) == 0)[0]
         nearest_centroid_squeeze = np.squeeze(np.zeros(np.size(nearest_centroid)).astype(int))
@@ -389,5 +391,5 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
-cluster(variant = 'kmeans', hd=False, k=3)
+cluster(variant = 'kmeans', start = "k++", hd=False, k=3)
 
