@@ -276,16 +276,16 @@ def ellbow_cluster(where = "self", clusters = 4, var = "kmeans"):
             sq_dist = wss("self")
             
         if where == "self":
-            kmeans("randcell", k, 20, 0.00001)
+            kmeans("k++", k, 20, 0.00001)
             sq_dist = wss("self")
         if where == "sklearn":
-           sklearn_kmeans_function(var,k,"randcell")
+           sklearn_kmeans_function(var,k,"k++")
            sq_dist = wss("sklearn") 
         sq_dist_array = np.append(sq_dist_array,sq_dist)
         
         k+=1
     print(sq_dist_array)
-    plt.plot( sq_dist_array)
+    plt.plot(np.arange(1,clusters+1), sq_dist_array)
     plt.show()    
 
 def sklearn_kmeans_function(var, k, start):
