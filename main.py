@@ -29,8 +29,7 @@ def runtime_end():
 def random_start_centroids(starttype):
     # Create Centroid Array by randomly picking k pbmcs from data
     global centroids_array, genes
-    pbmcs = pca_data.shape[0]
-    genes = pca_data.shape[1]
+
     centroids_array = np.empty([0, genes])
 
     if starttype == "randcell":
@@ -237,7 +236,10 @@ def remove_outliers():
 
 # PCA
 def pca(d, rmo=False):
-    global dim, pca_data
+    global dim, pca_data, pbmcs, genes
+    
+    pbmcs = pca_data.shape[0]
+    genes = pca_data.shape[1]
     dim = d
     pca = PCA(n_components=dim)
     pca_data = pca.fit_transform(filtered_data)
