@@ -237,15 +237,16 @@ def remove_outliers():
 # PCA
 def pca(d, rmo=False):
     global dim, pca_data, pbmcs, genes
-    
-    pbmcs = pca_data.shape[0]
-    genes = pca_data.shape[1]
+
     dim = d
     pca = PCA(n_components=dim)
     pca_data = pca.fit_transform(filtered_data)
     if rmo == True:
         remove_outliers()
     print("Sum of explained variances: ""%.2f" % (sum(pca.explained_variance_ratio_)) + "\n")
+    
+    pbmcs = pca_data.shape[0]
+    genes = pca_data.shape[1]
     # print(pca.singular_values_)
 
 
