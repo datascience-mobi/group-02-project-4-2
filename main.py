@@ -97,25 +97,32 @@ def new_centroids():
         centroids_array = np.append(centroids_array, np.expand_dims(calc_means, axis = 0), axis = 0)
         i += 1
 
-def Kppcentroids():
+def Kppcentroids(k = 3):
     global centroids_array, pbmcs, genes
     pbmcs = pca_data.shape[0]
     genes = pca_data.shape[1]
     centroids_array = np.empty([0, genes])
-    first_centroid = np.random.randint(pbmcs, size=0)
+    first_centroid = np.random.randint(pbmcs, size=1)
     i = 1
-    centroids_array = np.append(centroids_array, [pca_data[first_centroid, :]], axis=0)
-    dist_array = np.empty [0,pbmcs]
+    centroids_array = np.append(centroids_array, pca_data[first_centroid, :], axis=0)
+    print(first_centroid, centroids_array)
+    dist_array = np.empty ([0,pbmcs])
+    j = 0
+    l = 0
+    
     while i < k:
         while j < pbmcs:
-            while l < k:
-                if sml_distance == 0 or dist(i, j) < sml_distance:
-                    sml_distance = dist(i, j)
-                l =+ 1
-            np.append(dist_array,sml_distance **2)        
-            j =+ 1
-        k =+ 1
-    return dist_array
+            z = centroids_array.shape[0]
+            sml_distance = 0
+            while l < z:
+                if sml_distance == 0 or dist(l, j) < sml_distance:
+                    sml_distance = dist(l , j)
+                l += 1
+            dist_array = np.append(dist_array,sml_distance **2)        
+            j += 1
+        i += 1
+    print(dist_array.shape)
+    return(dist_array)
 
 # Function giving distance between clusters after n iterations            
 def improv():
