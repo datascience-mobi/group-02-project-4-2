@@ -100,6 +100,7 @@ def new_centroids():
         calc_means = np.mean(pca_data[nearest_centroid_squeeze == i], axis = 0)
         centroids_array = np.append(centroids_array, np.expand_dims(calc_means, axis = 0), axis = 0)
         i += 1
+    
 
 def kppcentroids():
     global centroids_array, dist_array, prob_array
@@ -267,6 +268,7 @@ def ellbow_pca(components):
     plt.ylabel('explained variance')
     plt.show()
 
+
 def ellbow_cluster(where = "self", clusters = 4, var = "kmeans"):
     k = 1
     sq_dist = 0
@@ -289,12 +291,12 @@ def ellbow_cluster(where = "self", clusters = 4, var = "kmeans"):
     plt.plot(np.arange(1,clusters+1), sq_dist_array)
     plt.show()    
 
+
 def sklearn_kmeans_function(var, k, start):
     global y_sklearnkmeans, sklearn_kmeans, pca_data
     runtime_start()
     if start == "randcell" or start == "randnum": 
         if var == "kmeans":
-            sklearn_kmeans = KMeans(init='random', n_clusters=k).fit(pca_data)
         if var == "mini":
             sklearn_kmeans = MiniBatchKMeans(n_clusters=k, init = 'random', max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
     if start == "k++": 
@@ -351,12 +353,12 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
         if variant == "kmeans":
             kmeans(start, k, max_iterations, threshold)
             sklearn_kmeans_function("kmeans", k, start)
-            plots()
+            # plots()
 
         if variant == "mini":
             minibatch(k, max_iterations, batch_size)
             sklearn_kmeans_function("mini", k, start)
-            plots("mini")
+            # plots("mini")
 
 
 def highlightdiffs(start, k, max_iterations, threshold, batch_size):
@@ -386,6 +388,29 @@ def highlightdiffs(start, k, max_iterations, threshold, batch_size):
     plt3.set_title('differences')
 
 
+def multi_cluster(start = 'k++', k = 3, n_init = 10):
+    pca(5, rmo = True)
+    clusteringarray = np.empty([pca_data.shape[0], n_init])
+    centroidsarray = np.empty([n_init, 3, pca_data.shape[1]])
+    wssarray = []
+
+    i = 0
+    while i<n_init:
+        kmeans(start, k, 30, 0.0001)
+        wssarray.append(wss('self'))
+        clusteringarray[:,i] = nearest_centroid_squeeze
+        centroidsarray[i,:, :] = centroids_array
+        i += 1
+
+    bestwssindex = wssarray.index(min(wssarray))
+    bestclustering = np.squeeze(clusteringarray[:, bestwssindex]).astype(int)
+
+    fig4 = plt.figure(4, figsize=[5, 5], dpi=200)
+    plt4 = fig4.subplots(1)
+    plt4.scatter(pca_data[:, 0], pca_data[:, 1], c=bestclustering, s=0.5, cmap='gist_rainbow')
+    plt4.plot(centroidsarray[bestwssindex, :, 0], centroidsarray[bestwssindex, :, 1], markersize=5, marker="s", linestyle='None', c='w')
+    plt4.set_title('kmeans')
+
     
 
 # General Code
@@ -409,5 +434,4 @@ filtered_data = np.array(data._X.todense())
 #     plt.draw()
 #     plt.pause(.1)
 
-cluster(variant = 'kmeans', start = "k++", hd=False, k=3)
-
+multi_cluster()
