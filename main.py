@@ -297,6 +297,7 @@ def sklearn_kmeans_function(var, k, start):
     runtime_start()
     if start == "randcell" or start == "randnum": 
         if var == "kmeans":
+            sklearn_kmeans = KMeans(init='random', n_clusters=k).fit(pca_data)
         if var == "mini":
             sklearn_kmeans = MiniBatchKMeans(n_clusters=k, init = 'random', max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
     if start == "k++": 
