@@ -381,15 +381,17 @@ def highlightdiffs(start=None, k=None, max_iterations=None, threshold=None, batc
         vm = np.squeeze(nearest_centroid.astype(int))
     
     if between == "self":
-        centroids_array = centroids_array[centroids_array[:,0].argsort()]
-        assign_centroids(pca_data)
-        vr = np.squeeze(nearest_centroid.astype(int))
+        vr = nearest_centroid_squeeze
 
-        centroids_array = sklearn_kmeans.cluster_centers_
-        centroids_array = centroids_array[centroids_array[:,0].argsort()]
-        assign_centroids(pca_data)
-        vm = np.squeeze(nearest_centroid.astype(int))
-        print(vm)    
+        i = 0
+        l = np.size(np.unique(vr))
+        while i < l:
+            a = np.where(vr == l - i)
+            c = np.where(y_sklearnkmeans == y_sklearnkmeans[a[0][0]])
+            y_sklearnkmeans[c] = vr[a[0][0]]
+            i+=1
+
+        vm = np.squeeze(y_sklearnkmeans.astype(int)) 
 
     # Compare results of both algorithms and find differences
     vn = np.where(np.subtract(vr, vm) == 0)[0]
