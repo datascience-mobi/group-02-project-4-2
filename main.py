@@ -1,6 +1,7 @@
 # Import libraries
 import numpy as np
-import pandas
+import sys
+import os
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import scanpy as sc
@@ -306,7 +307,7 @@ def sklearn_kmeans_function(var, k, start):
         if var == "mini":
             sklearn_kmeans = MiniBatchKMeans(n_clusters=k, max_iter=n_iterationsg, batch_size=bg).fit(pca_data)
     y_sklearnkmeans = sklearn_kmeans.predict(pca_data)
-    print("\nsklearn kmeans:")
+    print("\nsklearn kmeans (best of 10):")
     print(runtime_end())
     print("\twss: " + str(wss('sklearn')))
 
@@ -390,7 +391,11 @@ def highlightdiffs(start, k, max_iterations, threshold, batch_size):
 
 
 def multi_cluster(start = 'k++', k = 3, n_init = 10):
+    global nearest_centroid_squeeze, centroids_array
     pca(5, rmo = True)
+    original_stdout = sys.stdout
+    sys.stdout = open(os.devnull, 'w')
+    runtime_start()
     clusteringarray = np.empty([pca_data.shape[0], n_init])
     centroidsarray = np.empty([n_init, 3, pca_data.shape[1]])
     wssarray = []
@@ -399,18 +404,25 @@ def multi_cluster(start = 'k++', k = 3, n_init = 10):
     while i<n_init:
         kmeans(start, k, 30, 0.0001)
         wssarray.append(wss('self'))
-        clusteringarray[:,i] = nearest_centroid_squeeze
-        centroidsarray[i,:, :] = centroids_array
+        clusteringarray[:, i] = nearest_centroid_squeeze
+        centroidsarray[i, :, :] = centroids_array
         i += 1
 
     bestwssindex = wssarray.index(min(wssarray))
     bestclustering = np.squeeze(clusteringarray[:, bestwssindex]).astype(int)
 
-    fig4 = plt.figure(4, figsize=[5, 5], dpi=200)
-    plt4 = fig4.subplots(1)
-    plt4.scatter(pca_data[:, 0], pca_data[:, 1], c=bestclustering, s=0.5, cmap='gist_rainbow')
-    plt4.plot(centroidsarray[bestwssindex, :, 0], centroidsarray[bestwssindex, :, 1], markersize=5, marker="s", linestyle='None', c='w')
-    plt4.set_title('kmeans')
+    sys.stdout.close()
+    sys.stdout = original_stdout
+    print("\nKMEANS:")
+    print("\ngroup 4_2 algorithm (best of " + str(n_init) + "):")
+    print(runtime_end())
+    print("\twss: " + str(min(wssarray)))
+
+    sklearn_kmeans_function("kmeans", k, start)
+    nearest_centroid_squeeze = bestclustering
+    centroids_array[:, 0] = centroidsarray[bestwssindex, :, 0]
+    centroids_array[:, 1] = centroidsarray[bestwssindex, :, 1]
+    plots()
 
     
 
