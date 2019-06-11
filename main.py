@@ -4,6 +4,7 @@ import sys
 import os
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import matplotlib.patches as mpatches
 import scanpy as sc
 from matplotlib import colors
 from datetime import datetime
@@ -363,31 +364,51 @@ def cluster(pcas = 5, rmo=True, variant = 'kmeans', start='randcell', k = 3, max
             # plots("mini")
 
 
-def highlightdiffs(start, k, max_iterations, threshold, batch_size):
+def highlightdiffs(start=None, k=None, max_iterations=None, threshold=None, batch_size=None, between="self"):
     global nearest_centroid_squeeze, centroids_array
 
-    # Performing KMeans clustering and saving results
-    kmeans(start, k, max_iterations, threshold)
-    centroids_array = centroids_array[centroids_array[:,0].argsort()]
-    assign_centroids(pca_data)
-    vr = np.squeeze(nearest_centroid.astype(int))
+    if between == "reg/mb":
+        # Performing KMeans clustering and saving results
+        kmeans(start, k, max_iterations, threshold)
+        centroids_array = centroids_array[centroids_array[:,0].argsort()]
+        assign_centroids(pca_data)
+        vr = np.squeeze(nearest_centroid.astype(int))
 
-    # Performing Mini-Batch KMeans clustering and saving results
-    minibatch(k, max_iterations, batch_size)
-    centroids_array = centroids_array[centroids_array[:,0].argsort()]
-    assign_centroids(pca_data)
-    vm = np.squeeze(nearest_centroid.astype(int))
+        # Performing Mini-Batch KMeans clustering and saving results
+        minibatch(k, max_iterations, batch_size)
+        centroids_array = centroids_array[centroids_array[:,0].argsort()]
+        assign_centroids(pca_data)
+        vm = np.squeeze(nearest_centroid.astype(int))
+    
+    if between == "self":
+        centroids_array = centroids_array[centroids_array[:,0].argsort()]
+        assign_centroids(pca_data)
+        vr = np.squeeze(nearest_centroid.astype(int))
+
+        centroids_array = sklearn_kmeans.cluster_centers_
+        centroids_array = centroids_array[centroids_array[:,0].argsort()]
+        assign_centroids(pca_data)
+        vm = np.squeeze(nearest_centroid.astype(int))
+        print(vm)    
 
     # Compare results of both algorithms and find differences
     vn = np.where(np.subtract(vr, vm) == 0)[0]
     nearest_centroid_squeeze = np.squeeze(np.zeros(np.size(nearest_centroid)).astype(int))
     np.put(nearest_centroid_squeeze, vn, 1)
+    diffsabso = np.count_nonzero(nearest_centroid_squeeze == 0)
+    diffsperc = round(diffsabso/np.size(nearest_centroid_squeeze)*100, 3)
+    if diffsabso == 0:
+        nearest_centroid_squeeze = nearest_centroid_squeeze.fill(1)
+    print("The clusters assigned " + str(diffsperc) + "% (" + str(diffsabso) + ") of the points differently.")
 
     # Plot
     fig3 = plt.figure(3, figsize=[5, 5], dpi=200)
     plt3 = fig3.subplots(1)
     plt3.scatter(pca_data[:, 0], pca_data[:, 1], c=nearest_centroid_squeeze, s=0.5, cmap=colors.ListedColormap(['red', 'white']))
     plt3.set_title('differences')
+    white_patch = mpatches.Patch(color='white', label='Identical')
+    red_patch = mpatches.Patch(color='red', label='Different')
+    plt.legend(handles=[white_patch, red_patch])
 
 
 def multi_cluster(start = 'k++', k = 3, n_init = 10):
