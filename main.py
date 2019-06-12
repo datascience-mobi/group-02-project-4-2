@@ -399,9 +399,6 @@ def highlightdiffs(start=None, k=None, max_iterations=None, threshold=None, batc
         np.put(nearest_centroid_squeeze, vn, 1)
         diffsabso = np.count_nonzero(nearest_centroid_squeeze == 0)
         diffsperc = round(diffsabso/np.size(nearest_centroid_squeeze)*100, 3)
-
-        if diffsabso == 0:
-            nearest_centroid_squeeze.fill(1)
         print("The clusters assigned " + str(diffsperc) + "% (" + str(diffsabso) + ") of the points differently.")
 
     # Plot
@@ -415,6 +412,8 @@ def highlightdiffs(start=None, k=None, max_iterations=None, threshold=None, batc
     white_patch = mpatches.Patch(color='white', label='Identical')
     red_patch = mpatches.Patch(color='red', label='Different')
     plt.legend(handles=[white_patch, red_patch])
+
+    nearest_centroid_squeeze = vr
 
 
 def multi_cluster(start = 'k++', k = 3, n_init = 10):
