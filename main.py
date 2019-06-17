@@ -383,13 +383,20 @@ def highlightdiffs(start=None, k=None, max_iterations=None, threshold=None, batc
     
     if between == "self":
         vr = nearest_centroid_squeeze
-        ran = randint(0, 10)
         i = 0
         l = np.size(np.unique(vr))
         while i < l:
+            # Select indices of all highest cluster index elements
             a = np.where(vr == l - i)
-            c = np.where(y_sklearnkmeans == y_sklearnkmeans[a[0][ran]])
-            y_sklearnkmeans[c] = vr[a[0][ran]]
+            # Find of those the one closest to the assigned center as it is least likely to be an outlier
+            b = np.subtract(pca_data[a, :], centroids_array[(l-i-1), :])
+            b = np.squeeze(b[0, :, :])
+            ct = np.absolute(np.sum(b, axis=1))
+            # Return index with regards to a as to where the closest data point is
+            ctt = np.where(ct == np.amin(ct))
+            # Select the same datapoint in sklearn clustering and reassign the new number to all elements of indifferently clusterd elements
+            c = np.where(y_sklearnkmeans == y_sklearnkmeans[a[0][ctt]])
+            y_sklearnkmeans[c] = vr[a[0][ctt]]
             i+=1
         vm = np.squeeze(y_sklearnkmeans.astype(int)) 
 
@@ -399,7 +406,7 @@ def highlightdiffs(start=None, k=None, max_iterations=None, threshold=None, batc
         np.put(nearest_centroid_squeeze, vn, 1)
         diffsabso = np.count_nonzero(nearest_centroid_squeeze == 0)
         diffsperc = round(diffsabso/np.size(nearest_centroid_squeeze)*100, 3)
-        print("The clusters assigned " + str(diffsperc) + "% (" + str(diffsabso) + ") of the points differently.")
+        print("The algorithms assigned " + str(diffsperc) + "% (" + str(diffsabso) + ") of the points differently.")
 
     # Plot
     fig3 = plt.figure(3, figsize=[5, 5], dpi=200)
